@@ -31,7 +31,7 @@ Start the SFT training process:
 sh ./scripts/sft.sh &
 ```
 
-### 3️⃣ Multi-Negative Preference Optimization (PO)
+### 3️⃣ Multi-Negative Preference Optimization (DMPO-based DynamicPO)
 
 Run the DynamicPO training:
 
