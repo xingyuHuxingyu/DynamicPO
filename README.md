@@ -1,7 +1,7 @@
 
 #  DynamicPO
 
-> **Codes and data of DynamicPO**
+> **Official Implementation of DynamicPO: Dynamic Preference Optimization for Recommendation**
 
 ## 📋 Requirements
 
@@ -31,7 +31,7 @@ Start the SFT training process:
 sh ./scripts/sft.sh &
 ```
 
-### 3️⃣ Preference Optimization (PO)
+### 3️⃣ Multi-Negative Preference Optimization (PO)
 
 Run the DynamicPO training:
 
