@@ -1,7 +1,7 @@
 
 #  DynamicPO
 
-> **Official Implementation of DynamicPO: Dynamic Preference Optimization for Recommendation**
+> **Official Implementation of "DynamicPO: Dynamic Preference Optimization for Recommendation".**
 
 ## 📋 Requirements
 
