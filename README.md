@@ -55,3 +55,6 @@ DynamicPO/
 ├── scripts/        # Training and inference scripts        
 └── trainer/        #  Model implementations
 ```
+
+## Acknowledgment
+Our implementation is built upon the [TRL library](https://github.com/huggingface/trl). We are grateful to the authors of [DMPO](https://github.com/BZX667/DMPO) and [S-DPO](https://github.com/chenyuxin1999/S-DPO) for their insightful work on multi-negative preference optimization for recommendation systems, which inspired parts of this work.
