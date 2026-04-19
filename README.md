@@ -10,11 +10,12 @@ You can refer to the `requirements.txt`, or install the core modules with:
 - **PyTorch**: `2.4.0`
 - **Transformers**: `4.43.3`
 - **Hardware**: 4 NVIDIA A100 GPUs
+
 To install using pip, run:
 
 ```bash
 pip install -r requirements.txt
-
+```
 
 ## 🚀 Quick Start
 
