@@ -82,9 +82,9 @@ N \cdot \pi_\theta(y_w \mid x)
 You can refer to the `requirements.txt`, or install the core modules with:
 
 - **Python**: `python>=3.9`
-- **PyTorch**: `2.4.0`
+- **PyTorch**: torch>=`2.4.0`
 - **Transformers**: `4.43.3`
-- **Hardware**: 4 NVIDIA A100 GPUs
+- **Hardware**: Recommended: at least 4 NVIDIA GPUs, including A100, H100, or H200
 
 To install using pip, run:
 
