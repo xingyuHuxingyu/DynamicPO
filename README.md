@@ -1,6 +1,8 @@
 # DynamicPO
 
-> Code for "**DynamicPO: Dynamic Preference Optimization for Recommendation**" ![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)
+> Code for "**DynamicPO: Dynamic Preference Optimization for Recommendation**"
+>
+> ![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)
 
 
 ## Overview
@@ -152,7 +154,7 @@ The second figure shows how the reward winner rate evolves during training for v
 ![Figure 4b: Reward accuracy evolution](assets/figure4b_reward_accuracy_evolution.png)
 
 
-## Supplementary Experiments
+## Supplementary Multi-objective Experiments
 
 The supplementary exploratory study provides additional scripts for evaluating DynamicPO on other multi-negative preference optimization objectives. These experiments are not the main reproduction path of the paper, but they help readers examine whether the DynamicPO idea can generalize beyond the main DMPO setting.
 
@@ -165,7 +167,7 @@ It includes two objective families:
 
 The runnable entrypoint is `exploratory_study.py`, which uses `trainer/exploratory_study_trainer.py`.
 
-### Quick Start
+### Reproducing Supplementary Comparisons
 
 Run one of the following scripts depending on the objective family you want to reproduce:
 
@@ -338,4 +340,4 @@ This work received the **DASFAA 2026 Best Paper Award**.
 ## Acknowledgment
 
 This implementation is built upon the [TRL library](https://github.com/huggingface/trl).
-We sincerely thank the authors of [DMPO](https://github.com/BZX667/DMPO), MPPO, [S-DPO](https://github.com/chenyuxin1999/S-DPO), and [LLaRA](https://arxiv.org/pdf/2312.02445) for their valuable work on LLM-based recommendation and multi-negative preference optimization, which provide important foundations for this research direction.
+We sincerely thank the authors of [DMPO](https://github.com/BZX667/DMPO), [MPPO](https://arxiv.org/abs/2412.15244), [S-DPO](https://github.com/chenyuxin1999/S-DPO), and [LLaRA](https://arxiv.org/pdf/2312.02445) for their valuable work on LLM-based recommendation and multi-negative preference optimization, which provide important foundations for this research direction.
