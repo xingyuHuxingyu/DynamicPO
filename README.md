@@ -116,20 +116,6 @@ For the broader comparison setting, we follow previous research for the traditio
 | Vanilla | 0.5848 | 0.5349 | 0.6383 |
 | DynamicPO | 0.6661 | 0.6728 | 0.6990 |
 
-#### MPPO
-
-| Variant | LastFM HR@1 | Goodreads HR@1 | Steam HR@1 |
-| --- | ---: | ---: | ---: |
-| Vanilla | 0.6597 | 0.6993 | 0.7614 |
-| DynamicPO | 0.6906 | 0.7226 | 0.8069 |
-
-#### S-DPO
-
-| Variant | LastFM HR@1 | Goodreads HR@1 | Steam HR@1 |
-| --- | ---: | ---: | ---: |
-| Vanilla | 0.6617 | 0.6778 | 0.6948 |
-| DynamicPO | 0.6666 | 0.6843 | 0.6998 |
-
 ### Cross-backbone Generalization
 
 | Base Model | Variant | LastFM HR@1 | Goodreads HR@1 |
@@ -169,6 +155,22 @@ It includes two objective families:
 - S-DPO and DynamicPO-S-DPO
 
 The runnable entrypoint is `exploratory_study.py`, which uses `trainer/exploratory_study_trainer.py`.
+
+### Supplementary Results
+
+#### MPPO
+
+| Variant | LastFM HR@1 | Goodreads HR@1 | Steam HR@1 |
+| --- | ---: | ---: | ---: |
+| Vanilla | 0.6597 | 0.6993 | 0.7614 |
+| DynamicPO | 0.6906 | 0.7226 | 0.8069 |
+
+#### S-DPO
+
+| Variant | LastFM HR@1 | Goodreads HR@1 | Steam HR@1 |
+| --- | ---: | ---: | ---: |
+| Vanilla | 0.6617 | 0.6778 | 0.6948 |
+| DynamicPO | 0.6666 | 0.6843 | 0.6998 |
 
 ### Reproducing Supplementary Comparisons
 
