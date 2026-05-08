@@ -35,11 +35,125 @@ import warnings
 os.environ["PYTHONWARNINGS"] = "ignore"
 warnings.filterwarnings("ignore")
 
+FIXED_MARGIN = 6.0
+
 def is_peft_available():
     return importlib.util.find_spec("peft") is not None
 
 if is_peft_available():
     from peft import get_peft_model, prepare_model_for_kbit_training
+
+
+def _group_batch_values(values_dict: Dict[str, torch.FloatTensor]) -> Dict[int, List[torch.Tensor]]:
+    grouped_values: Dict[int, List[torch.Tensor]] = {}
+    first_key = next(iter(values_dict))
+    batch_size = len(values_dict[first_key])
+    for _, value in values_dict.items():
+        for i in range(batch_size):
+            grouped_values.setdefault(i, []).append(value[i])
+    return grouped_values
+
+
+def _to_python_nested_list(values: Dict[int, List[torch.Tensor]]) -> List[List[float]]:
+    nested_values: List[List[float]] = []
+    for i in range(len(values)):
+        nested_values.append([float(tensor.detach().cpu().item()) for tensor in values[i]])
+    return nested_values
+
+
+def _cluster_high_reward_indices(rewards: List[torch.Tensor], num_clusters: int = 3) -> List[int]:
+    reward_array = np.array([float(tensor.detach().cpu().item()) for tensor in rewards])
+    cluster_num = min(num_clusters, len(reward_array))
+    if cluster_num <= 1:
+        return list(range(len(reward_array)))
+
+    kmeans = KMeans(n_clusters=cluster_num, random_state=42).fit(reward_array.reshape(-1, 1))
+    labels = kmeans.labels_
+    cluster_means = [np.mean(reward_array[labels == idx]) for idx in range(cluster_num)]
+    return np.where(labels == int(np.argmax(cluster_means)))[0].tolist()
+
+
+def _select_boundary_critical_samples(
+    target_values: Dict[str, torch.FloatTensor],
+    threshold_values: torch.FloatTensor,
+    policy_rejected_values: Dict[str, torch.FloatTensor],
+) -> Tuple[List[List[torch.Tensor]], List[List[torch.Tensor]], List[torch.Tensor], List[List[float]]]:
+    batch_target = _group_batch_values(target_values)
+    batch_policy_rejected = _group_batch_values(policy_rejected_values)
+    batch_policy_rejected_list = _to_python_nested_list(batch_policy_rejected)
+
+    boundary_critical_sample_list: List[List[torch.Tensor]] = []
+    policy_boundary_critical_list: List[List[torch.Tensor]] = []
+    policy_model_discriminative_mean_list: List[torch.Tensor] = []
+
+    for sample_idx in range(len(batch_policy_rejected)):
+        sample_target_values = batch_target[sample_idx]
+        sample_policy_values = batch_policy_rejected[sample_idx]
+
+        boundary_critical_indices = [
+            idx for idx, value in enumerate(sample_policy_values) if value >= threshold_values[sample_idx]
+        ]
+        if len(boundary_critical_indices) < 1:
+            boundary_critical_indices = _cluster_high_reward_indices(sample_policy_values)
+
+        model_discriminative_indices = [
+            idx for idx in range(len(sample_policy_values)) if idx not in boundary_critical_indices
+        ]
+        if len(model_discriminative_indices) < 1:
+            model_discriminative_indices = boundary_critical_indices
+
+        boundary_critical_sample_list.append([sample_target_values[idx] for idx in boundary_critical_indices])
+        policy_boundary_critical_list.append([sample_policy_values[idx] for idx in boundary_critical_indices])
+        policy_model_discriminative_mean_list.append(
+            sum(sample_policy_values[idx] for idx in model_discriminative_indices) / len(model_discriminative_indices)
+        )
+
+    return (
+        boundary_critical_sample_list,
+        policy_boundary_critical_list,
+        policy_model_discriminative_mean_list,
+        batch_policy_rejected_list,
+    )
+
+
+def _build_dynamic_beta_records(
+    policy_chosen_logps: torch.FloatTensor,
+    policy_boundary_critical_list: List[List[torch.Tensor]],
+    policy_model_discriminative_mean_list: List[torch.Tensor],
+    beta: float,
+    margin: float = FIXED_MARGIN,
+) -> Tuple[List[List[float]], List[List[float]], List[List[float]]]:
+    sample_level_beta_record: List[List[float]] = []
+    delta_pos2boundary_record: List[List[float]] = []
+    delta_boundary2discriminative_record: List[List[float]] = []
+
+    for i in range(policy_chosen_logps.size(0)):
+        beta_record = []
+        pos2boundary_record = []
+        boundary2discriminative_record = []
+
+        for boundary_critical_logp in policy_boundary_critical_list[i]:
+            beta_value = beta
+            delta_pos2boundary = policy_chosen_logps[i] - boundary_critical_logp
+            delta_boundary2discriminative = (
+                boundary_critical_logp - policy_model_discriminative_mean_list[i]
+            )
+
+            pos2boundary_record.append(float(delta_pos2boundary.detach().cpu().item()))
+            boundary2discriminative_record.append(float(delta_boundary2discriminative.detach().cpu().item()))
+
+            delta_diff = delta_pos2boundary - delta_boundary2discriminative - margin
+            delta_beta = delta_diff / (abs(delta_boundary2discriminative) + abs(delta_pos2boundary))
+            delta_beta = torch.tanh(delta_beta) * 0.5
+
+            beta_value = beta_value * (1 + delta_beta)
+            beta_record.append(float(beta_value.detach().cpu().item()))
+
+        sample_level_beta_record.append(beta_record)
+        delta_pos2boundary_record.append(pos2boundary_record)
+        delta_boundary2discriminative_record.append(boundary2discriminative_record)
+
+    return sample_level_beta_record, delta_pos2boundary_record, delta_boundary2discriminative_record
 
 
 
@@ -92,115 +206,51 @@ def preference_loss(
     
   
   
-    elif filter_mode=="DMPO_hard_negative_dynamic_beta_fixed_margin":
-        borderline_samples = []
-        policy_borderline_logps = []
-        policy_discriminative_means = []
-        
-        batch_rejected = {}
-        for (key, value) in rejected_logratios.items(): 
-            for i in range(len(rejected_logratios['rejected1'])):
-                batch_rejected.setdefault(i, []).append(value[i])
-        
-        batch_policy_rejected = {}
-        for (key, value) in policy_rejected_logps.items(): 
-            for i in range(len(policy_rejected_logps['rejected1'])):
-                batch_policy_rejected.setdefault(i, []).append(value[i])
-        
-        batch_policy_rejected_list = []
-        for i in range(len(batch_policy_rejected)):
-            sample_rejected_values = []
-            for tensor in batch_policy_rejected[i]:
-                if isinstance(tensor, torch.Tensor):
-                    sample_rejected_values.append(float(tensor.detach().cpu().item()))
-                else:
-                    sample_rejected_values.append(float(tensor))
-            batch_policy_rejected_list.append(sample_rejected_values)
-        
-        discriminative_logratios = []
-        
-        for num in range(len(rejected_logratios['rejected1'])):
-            key = num
-            
-            borderline_list = []
-            discriminative_list = []
-            policy_borderline_list = []
-            policy_discriminative_list = []
+    elif filter_mode in {"DMPO_hard_negative_dynamic_beta_fixed_margin", "DynamicPO_DMPO"}:
+        (
+            boundary_critical_sample_list,
+            policy_boundary_critical_list,
+            policy_model_discriminative_mean_list,
+            batch_policy_rejected_list,
+        ) = _select_boundary_critical_samples(
+            target_values=rejected_logratios,
+            threshold_values=policy_chosen_logps,
+            policy_rejected_values=policy_rejected_logps,
+        )
 
-            for idx, value in enumerate(batch_policy_rejected[key]):
-                if value >= policy_chosen_logps[key]:
-                    borderline_list.append(batch_rejected[key][idx])
-            
-            if len(borderline_list) < 1:
-                rewards = np.array([tensor.detach().cpu().numpy() for tensor in batch_policy_rejected[key]])
-                kmeans = KMeans(n_clusters=3, random_state=42).fit(rewards.reshape(-1, 1))
-                labels = kmeans.labels_
-                cluster_means = [np.mean(rewards[labels == i]) for i in range(3)]
-                high_reward_cluster = np.argmax(cluster_means)
-                borderline_indices = np.where(labels == high_reward_cluster)[0]
+        (
+            sample_level_beta_record,
+            delta_pos2boundary_record,
+            delta_boundary2discriminative_record,
+        ) = _build_dynamic_beta_records(
+            policy_chosen_logps=policy_chosen_logps,
+            policy_boundary_critical_list=policy_boundary_critical_list,
+            policy_model_discriminative_mean_list=policy_model_discriminative_mean_list,
+            beta=beta,
+        )
 
-                borderline_list = [batch_rejected[key][i] for i in borderline_indices]
-                policy_borderline_list = [batch_policy_rejected[key][i] for i in borderline_indices]
-                discriminative_list = [batch_rejected[key][i] for i in range(len(rewards)) if i not in borderline_indices]
-                policy_discriminative_list = [batch_policy_rejected[key][i] for i in range(len(batch_policy_rejected[key])) if i not in borderline_indices]
-            else:
-                borderline_indices = [idx for idx, val in enumerate(batch_rejected[key]) if val in borderline_list]
-                policy_borderline_list = [batch_policy_rejected[key][i] for i in borderline_indices]
-                
-                if len(borderline_indices) == len(batch_policy_rejected[key]):
-                    policy_discriminative_list = policy_borderline_list
-                    discriminative_list = borderline_list
-                else:
-                    discriminative_list = [batch_rejected[key][i] for i in range(len(batch_policy_rejected[key])) if i not in borderline_indices]
-                    policy_discriminative_list = [batch_policy_rejected[key][i] for i in range(len(batch_policy_rejected[key])) if i not in borderline_indices]
-            
-            borderline_samples.append(borderline_list)
-            discriminative_logratios.append(sum(discriminative_list)/len(discriminative_list))
-            policy_borderline_logps.append(policy_borderline_list)
-            policy_discriminative_means.append(sum(policy_discriminative_list)/len(policy_discriminative_list))
-        
-        beta_records = []
-        pos_to_borderline_records = []
-        borderline_to_discriminative_records = []
-
+        batch_losses_list = []
         for i in range(chosen_logratios.size(0)):
-            beta_values = []
-            pos_to_borderline_values = []
-            borderline_to_discriminative_values = []
-            
-            for idx, neg_sample_logratio in enumerate(borderline_samples[i]):
-                beta_value = beta
-                
-                pos_to_borderline_diff = policy_chosen_logps[i] - policy_borderline_logps[i][idx]
-                borderline_to_discriminative_diff = policy_borderline_logps[i][idx] - policy_discriminative_means[i]
-                
-                pos_to_borderline_values.append(float(pos_to_borderline_diff.detach().cpu().item()))
-                borderline_to_discriminative_values.append(float(borderline_to_discriminative_diff.detach().cpu().item()))
-                
-                margin_diff = pos_to_borderline_diff - borderline_to_discriminative_diff - 2.0
-                denominator = abs(borderline_to_discriminative_diff) + abs(pos_to_borderline_diff)
-                beta_adjustment = margin_diff / denominator
-                beta_adjustment = torch.tanh(beta_adjustment) * 0.5
-                
-                beta_value = beta_value * (1 + beta_adjustment)
-                beta_value = float(beta_value.detach().cpu().item())
-                beta_values.append(beta_value)
-                
-            beta_records.append(beta_values)
-            pos_to_borderline_records.append(pos_to_borderline_values)
-            borderline_to_discriminative_records.append(borderline_to_discriminative_values)
+            k = len(boundary_critical_sample_list[i])
+            dmpo_loss_item = -F.logsigmoid(
+                sum(
+                    sample_level_beta_record[i][idx] * chosen_logratios[i] / k
+                    - sample_level_beta_record[i][idx] * neg_sample_logratio / k
+                    for idx, neg_sample_logratio in enumerate(boundary_critical_sample_list[i])
+                )
+            )
+            batch_losses_list.append(dmpo_loss_item)
 
-        batch_losses = []
-        for i in range(chosen_logratios.size(0)):
-            K = len(borderline_samples[i])
-            loss_terms = [beta_records[i][idx] * chosen_logratios[i] / K - beta_records[i][idx] * neg_sample_logratio / K 
-                        for idx, neg_sample_logratio in enumerate(borderline_samples[i])]
-            loss_item = -F.logsigmoid(sum(loss_terms))
-            batch_losses.append(loss_item)
+        losses = torch.stack(batch_losses_list)
 
-        losses = torch.stack(batch_losses)
-
-        return (losses, None), policy_borderline_logps, batch_policy_rejected_list, chosen_rewards, rejected_rewards, (beta_records, pos_to_borderline_records, borderline_to_discriminative_records)
+        return (
+            (losses, None),
+            policy_boundary_critical_list,
+            batch_policy_rejected_list,
+            chosen_rewards,
+            rejected_rewards,
+            (sample_level_beta_record, delta_pos2boundary_record, delta_boundary2discriminative_record),
+        )
 
 
    
@@ -337,11 +387,11 @@ class DPOTrainer(Trainer):
 
 
     
-        self.delta_hard_neg2easy_neg_mean = torch.zeros(1, device='cuda')
-        self.delta_hard_neg2easy_neg_std = torch.zeros(1, device='cuda')
+        self.delta_boundary2discriminative_mean = torch.zeros(1, device='cuda')
+        self.delta_boundary2discriminative_std = torch.zeros(1, device='cuda')
 
-        self.delta_pos2hardneg_mean = torch.zeros(1, device='cuda')
-        self.delta_pos2hardneg_std = torch.zeros(1, device='cuda')
+        self.delta_pos2boundary_mean = torch.zeros(1, device='cuda')
+        self.delta_pos2boundary_std = torch.zeros(1, device='cuda')
 
         self._stored_metrics = defaultdict(lambda: defaultdict(list))
 
@@ -507,7 +557,14 @@ class DPOTrainer(Trainer):
             rejected_logratios[key] = policy_rejected_logps[key] - reference_rejected_logps[key] if self.ref_model is not None else None
 
 
-        (losses, margin_record), hard_neg_reward,all_neg_reward,chosen_rewards, rejected_rewards,(beta_used, delta_pos2hardneg_record, delta_hard_neg2easy_neg_record) = preference_loss(
+        (
+            losses,
+            margin_record,
+        ), boundary_critical_reward, all_negative_reward, chosen_rewards, rejected_rewards, (
+            beta_used,
+            delta_pos2boundary_record,
+            delta_boundary2discriminative_record,
+        ) = preference_loss(
             ref_model_enabled=self.ref_model is not None,
             policy_chosen_logps=policy_chosen_logps,
             policy_rejected_logps=policy_rejected_logps,
@@ -553,8 +610,8 @@ class DPOTrainer(Trainer):
                 return obj  
 
  
-        metrics["hard_neg_reward"] = convert_tensors_to_list(hard_neg_reward)
-        metrics["all_neg_reward"] = convert_tensors_to_list(all_neg_reward)
+        metrics["boundary_critical_reward"] = convert_tensors_to_list(boundary_critical_reward)
+        metrics["all_negative_reward"] = convert_tensors_to_list(all_negative_reward)
         metrics[f"margin_record"] = convert_tensors_to_list(margin_record)
 
 
@@ -562,33 +619,37 @@ class DPOTrainer(Trainer):
         
         
 
-        if isinstance(delta_hard_neg2easy_neg_record, list) and len(delta_hard_neg2easy_neg_record) > 0:
+        if isinstance(delta_boundary2discriminative_record, list) and len(delta_boundary2discriminative_record) > 0:
             flattened_deltas = []
-            for sample_deltas in delta_hard_neg2easy_neg_record:
+            for sample_deltas in delta_boundary2discriminative_record:
                 if isinstance(sample_deltas, list):
                     flattened_deltas.extend(sample_deltas)
                 else:
                     flattened_deltas.append(sample_deltas)
 
-        if isinstance(delta_pos2hardneg_record, list) and len(delta_pos2hardneg_record) > 0:
+        if isinstance(delta_pos2boundary_record, list) and len(delta_pos2boundary_record) > 0:
             
-            flattened_pos2hardneg = []
+            flattened_pos2boundary = []
             
-            for sample_deltas in delta_pos2hardneg_record:
+            for sample_deltas in delta_pos2boundary_record:
                 if isinstance(sample_deltas, list):
-                    flattened_pos2hardneg.extend(sample_deltas)
+                    flattened_pos2boundary.extend(sample_deltas)
                 else:
-                    flattened_pos2hardneg.append(sample_deltas)
+                    flattened_pos2boundary.append(sample_deltas)
             
 
 
 
 
         
-        metrics[f'{prefix}/delta_hard_neg2easy_neg_mean'] = self.delta_hard_neg2easy_neg_mean.cpu().numpy().tolist()
-        metrics[f'{prefix}/delta_hard_neg2easy_neg_std'] = self.delta_hard_neg2easy_neg_std.cpu().numpy().tolist()
-        metrics[f'{prefix}/delta_pos2hardneg_mean'] = self.delta_pos2hardneg_mean.cpu().numpy().tolist()
-        metrics[f'{prefix}/delta_pos2hardneg_std'] = self.delta_pos2hardneg_std.cpu().numpy().tolist()
+        metrics[f"{prefix}/delta_boundary2discriminative_mean"] = (
+            self.delta_boundary2discriminative_mean.cpu().numpy().tolist()
+        )
+        metrics[f"{prefix}/delta_boundary2discriminative_std"] = (
+            self.delta_boundary2discriminative_std.cpu().numpy().tolist()
+        )
+        metrics[f"{prefix}/delta_pos2boundary_mean"] = self.delta_pos2boundary_mean.cpu().numpy().tolist()
+        metrics[f"{prefix}/delta_pos2boundary_std"] = self.delta_pos2boundary_std.cpu().numpy().tolist()
         if isinstance(beta_used, float):
             beta_used_list_or_float = beta_used
             
@@ -596,16 +657,16 @@ class DPOTrainer(Trainer):
             beta_used_list_or_float = beta_used
         else:
             beta_used_list_or_float = beta_used.cpu().numpy().tolist()
-            delta_pos2hardneg_record= delta_pos2hardneg_record.cpu().numpy().tolist()
-            delta_hard_neg2easy_neg_record = delta_hard_neg2easy_neg_record.cpu().numpy().tolist()
+            delta_pos2boundary_record = delta_pos2boundary_record.cpu().numpy().tolist()
+            delta_boundary2discriminative_record = delta_boundary2discriminative_record.cpu().numpy().tolist()
         if isinstance(beta_used_list_or_float, list):
             metrics[f"{prefix}/beta_used"] = beta_used_list_or_float
-            metrics[f"{prefix}/delta_pos2hardneg_record"] = delta_pos2hardneg_record
-            metrics[f"{prefix}/delta_hard_neg2easy_neg_record"] = delta_hard_neg2easy_neg_record
+            metrics[f"{prefix}/delta_pos2boundary_record"] = delta_pos2boundary_record
+            metrics[f"{prefix}/delta_boundary2discriminative_record"] = delta_boundary2discriminative_record
         elif isinstance(beta_used_list_or_float, float):
             metrics[f"{prefix}/beta_used"] = [beta_used_list_or_float]
-            metrics[f"{prefix}/delta_pos2hardneg_record"] = delta_pos2hardneg_record
-            metrics[f"{prefix}/delta_hard_neg2easy_neg_record"] = delta_hard_neg2easy_neg_record
+            metrics[f"{prefix}/delta_pos2boundary_record"] = delta_pos2boundary_record
+            metrics[f"{prefix}/delta_boundary2discriminative_record"] = delta_boundary2discriminative_record
 
         
         return losses.mean(), metrics
@@ -717,8 +778,8 @@ class DPOTrainer(Trainer):
         train_eval = "train" if "loss" in logs else "eval"
         # Add averaged stored metrics to logs
         for key, metrics in self._stored_metrics[train_eval].items():
-            if key in ['filtered_losses', 'margin_record','losses_list','hard_neg_reward',
-                       'actual_losses_list','all_neg_reward','local_mask','eval_/beta_used','train_/beta_used','train_/delta_hard_neg2easy_neg_record','train_/delta_pos2hardneg_record','train_rewards/accuracies']:
+            if key in ['filtered_losses', 'margin_record','losses_list','boundary_critical_reward',
+                       'actual_losses_list','all_negative_reward','local_mask','eval_/beta_used','train_/beta_used','train_/delta_boundary2discriminative_record','train_/delta_pos2boundary_record','train_rewards/accuracies']:
                 logs[key] = metrics  
             else:
                 logs[key] = torch.tensor(metrics).float().mean().item()
@@ -727,5 +788,3 @@ class DPOTrainer(Trainer):
 
         del self._stored_metrics[train_eval]
         return super().log(logs)
-
-

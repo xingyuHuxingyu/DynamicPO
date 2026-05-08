@@ -1,0 +1,15 @@
+This person has played [HistoryHere] previously. Please predict the next game this person will play. Choose the answer from the following 20 game titles: [CansHere]. Answer:
+This person has played [HistoryHere] previously. Given the following 20 game titles: [CansHere], recommend one game for this person to play next. The game title you recommend is:
+The gaming history of this person is: [HistoryHere]. Recommend a next game for this person to play from the following game title set: [CansHere]. The recommendation should contain one game title only. Recommendation: 
+Based on the person's previous game of [HistoryHere], which game from the options [CansHere] do you think they will play next? Answer:
+This person has recently played [HistoryHere]. Can you predict the next game they will play from the provided options [CansHere]? Answer:
+After playing [HistoryHere], which game do you think the person will choose next from the given options [CansHere]? Answer:
+Having previously played [HistoryHere], which game from the list [CansHere] do you anticipate the person will play next? Answer:
+Can you predict the next game this person will play based on their previous choice of [HistoryHere]? Choose the answer from the provided options: [CansHere]. Answer:
+The person's gaming history includes [HistoryHere]. Now, which game do you expect them to play next? Select the answer from the given options: [CansHere]. Answer:
+Given that the person has already played [HistoryHere], which game would you recommend they play next from the available choices [CansHere]? Answer:
+After playing [HistoryHere], the person is presented with the following game options [CansHere]. Can you predict their next choice? Answer:
+The person's game history contains [HistoryHere]. Please suggest the next game they are likely to play from the provided options: [CansHere]. Answer:
+Given the previous game choice of [HistoryHere], which game do you anticipate the person will play next? Select the answer from the available options: [CansHere]. Answer:
+The person has recently played [HistoryHere]. Now, which game from the provided options [CansHere] do you predict they will play next? Answer:
+Based on the person's previous choice of [HistoryHere], which game would be the most likely next selection from the given options [CansHere]? Answer:
