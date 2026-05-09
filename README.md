@@ -24,6 +24,8 @@ We find that this collapse is caused by an imbalance between two types of negati
 
 To address this issue, DynamicPO dynamically selects **boundary-critical negatives** that are most helpful for decision-boundary refinement and adaptively adjusts the optimization strength for each selected negative. This enables more robust preference-boundary learning, effectively mitigates **preference optimization collapse**, and improves recommendation performance across multiple multi-negative preference optimization objectives with **negligible computational overhead**.
 
+Specifically, DynamicPO first prioritizes **preference-violation negatives** and then uses **likelihood-based clustering** to capture near-boundary negatives when no violation exists.
+
 ## Installation
 
 ### Requirements
@@ -51,7 +53,7 @@ unzip lastfm-sft-cans20.zip
 ```
 
 After extraction, the processed LastFM data will be available under `./data/`.
-The extracted files include the training and validation splits used for SFT and preference optimization.
+The extracted files include the processed splits used for supervised fine-tuning, preference optimization, and evaluation.
 
 Our data preprocessing and construction pipeline follows prior LLM-based recommendation work, mainly based on [LLaRA](https://arxiv.org/pdf/2312.02445) and [S-DPO](https://arxiv.org/pdf/2406.09215).
 Currently, we provide the processed **LastFM** data for quick reproduction.
@@ -119,7 +121,7 @@ A compact summary of the most important tables is shown below. The following tab
 For the broader comparison setting, we follow previous research for the traditional and LLM-based baselines and report their results, particularly under the benchmark construction and evaluation protocols adopted in LLaRA and S-DPO. Please refer to our arXiv paper for the full main-experiment comparison.
 
 > [!TIP]
-> We have also recently reproduced our experiments on **NVIDIA H200** GPUs and are organizing the corresponding checkpoints for release on **Hugging Face**. In our recent runs, we found that results on H200 can even be slightly better than the A100-based results reported in the paper. Therefore, small reproduction differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
+> Repository note: We have also recently reproduced our experiments on **NVIDIA H200** GPUs and are organizing the corresponding checkpoints for release on **Hugging Face**. In our recent repository-side runs, we found that results on H200 can even be slightly better than the A100-based results reported in the paper. Therefore, small reproduction differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
 
 ### Main Comparison
 
@@ -152,14 +154,14 @@ The first figure shows how the recommendation performance of vanilla DMPO and Dy
 
 ![Figure 4a: Negative sample scaling](assets/figure4a_negative_scaling.png)
 
-The second figure shows how the reward winner rate evolves during training for vanilla DMPO and DynamicPO.
+The second figure shows how the **reward win rate** evolves during training for vanilla DMPO and DynamicPO.
 
 ![Figure 4b: Reward accuracy evolution](assets/figure4b_reward_accuracy_evolution.png)
 
 
 ## Supplementary Multi-objective Experiments
 
-The supplementary exploratory study provides additional scripts for evaluating DynamicPO on other multi-negative preference optimization objectives. These experiments are **not the main reproduction path** of the paper, but they help readers examine whether the DynamicPO idea can **generalize beyond the main DMPO setting**.
+The supplementary exploratory study provides additional scripts for evaluating DynamicPO on other multi-negative preference optimization objectives. These experiments are **not the default Quick Start path** of this repository, but they correspond to the **multi-objective generalization study** reported in the paper.
 
 ### MPPO and S-DPO Extensions
 
@@ -267,9 +269,9 @@ DynamicPO/
 └── exploratory_study.py
 ```
 
-## Objective Functions
+## Base Objective Forms
 
-The following equations are reference objective forms used in the implementation. Please refer to their original papers for the full derivations.
+The following equations summarize the **base multi-negative objective forms** used in this repository. DynamicPO further augments these objectives with **dynamic boundary-negative selection** and **sample-level dynamic β adjustment**. Please refer to their original papers for the full derivations.
 
 ### [DMPO](https://arxiv.org/abs/2406.14868)
 
@@ -314,30 +316,7 @@ N \cdot \pi_\theta(y_w \mid x)
 
 ### [S-DPO](https://arxiv.org/abs/2406.09215)
 
-```math
-\mathcal{L}_{\mathrm{S-DPO}}(\pi_\theta; \pi_{\mathrm{ref}})
-=
--
-\mathbb{E}_{(x_u, e_p, E_d) \sim \mathcal{D}}
-\left[
-\log
-\left(
--
-\log
-\sum_{e_d \in E_d}
-\exp
-\left(
-\beta \log
-\frac{\pi_\theta(e_d \mid x_u)}
-{\pi_{\mathrm{ref}}(e_d \mid x_u)}
--
-\beta \log
-\frac{\pi_\theta(e_p \mid x_u)}
-{\pi_{\mathrm{ref}}(e_p \mid x_u)}
-\right)
-\right)
-\right]
-```
+We follow the S-DPO objective from the original paper and extend it with DynamicPO in the supplementary multi-objective experiments. Please refer to the original paper and our implementation for the exact objective.
 
 ## Citation
 
