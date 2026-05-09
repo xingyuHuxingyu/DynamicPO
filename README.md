@@ -114,7 +114,7 @@ A compact summary of the most important tables is shown below. The following tab
 
 For the broader comparison setting, we follow previous research for the traditional and LLM-based baselines and report their results, particularly under the benchmark construction and evaluation protocols adopted in LLaRA and S-DPO. Please refer to our arXiv paper for the full main-experiment comparison.
 
-
+> [!TIP]
 > We have also recently reproduced our experiments on **NVIDIA H200** GPUs and are organizing the corresponding checkpoints for release on **Hugging Face**. In our recent runs, we found that results on H200 can even be slightly better than the A100-based results reported in the paper. Therefore, small reproduction differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
 
 ### Main Comparison
