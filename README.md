@@ -4,19 +4,19 @@
 >
 > [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html)
 
-DynamicPO is a lightweight, plug-and-play preference optimization framework for LLM-based recommender systems.
+**DynamicPO** is a lightweight, plug-and-play preference optimization framework for LLM-based recommender systems.
 
 **Problem.** Recent multi-negative preference optimization methods suggest that using more negative samples can provide richer preference signals and improve recommendation performance. However, our empirical study reveals a counterintuitive phenomenon: when the number of negatives continues to increase, recommendation performance can degrade even though the training loss keeps decreasing. We refer to this as **preference optimization collapse**.
 
-**Analysis.** We find that this collapse is caused by an imbalance between two types of negatives. After SFT, the model already has a coarse-grained ability to distinguish many negatives from positives. As a result, model-discriminative negatives dominate the aggregated optimization signal, while boundary-critical negatives, which are truly useful for refining user preference boundaries, are diluted and under-optimized.
+**Analysis.** We find that this collapse is caused by an imbalance between two types of negatives. After SFT, the model already has a coarse-grained ability to distinguish many negatives from positives. As a result, **model-discriminative negatives** dominate the aggregated optimization signal, while **boundary-critical negatives**, which are truly useful for refining user preference boundaries, are diluted and under-optimized.
 
 **Key idea.** This analysis suggests three central observations:
 
 - More negative samples do not always lead to better preference optimization.
-- Model-discriminative negatives can dominate the aggregated optimization signal, while boundary-critical negatives are under-emphasized.
-- Dynamically selecting boundary-critical negatives and adaptively adjusting their optimization strength can lead to more effective preference-boundary refinement.
+- **Model-discriminative negatives** can dominate the aggregated optimization signal, while **boundary-critical negatives** are under-emphasized.
+- Dynamically selecting **boundary-critical negatives** and adaptively adjusting their optimization strength can lead to more effective preference-boundary refinement.
 
-**DynamicPO.** To address this issue, DynamicPO dynamically selects boundary-critical negatives that are most helpful for decision-boundary refinement and adaptively adjusts the optimization strength for each selected negative. This enables more robust preference-boundary learning, effectively mitigates preference optimization collapse, and improves recommendation performance across multiple multi-negative preference optimization objectives with negligible computational overhead.
+**DynamicPO.** To address this issue, DynamicPO dynamically selects **boundary-critical negatives** that are most helpful for decision-boundary refinement and adaptively adjusts the optimization strength for each selected negative. This enables more robust preference-boundary learning, effectively mitigates **preference optimization collapse**, and improves recommendation performance across multiple multi-negative preference optimization objectives with **negligible computational overhead**.
 
 ## Installation
 
@@ -48,11 +48,12 @@ After extraction, the processed LastFM data will be available under `./data/`.
 The extracted files include the training and validation splits used for SFT and preference optimization.
 
 Our data preprocessing and construction pipeline follows prior LLM-based recommendation work, mainly based on [LLaRA](https://arxiv.org/pdf/2312.02445) and [S-DPO](https://arxiv.org/pdf/2406.09215).
-Currently, we provide the processed LastFM data for quick reproduction.
+Currently, we provide the processed **LastFM** data for quick reproduction.
+We recommend that future researchers use **LastFM** first when validating their ideas and reproducing the pipeline, and only then move to **Goodreads** and **Steam**, since these two datasets usually require more computation than **LastFM**.
 
 ## Quick Start
 
-The main experiment in this repository is the DMPO-based DynamicPO pipeline. We provide separate scripts for:
+The main experiment in this repository is the **DMPO-based DynamicPO pipeline**. We provide separate scripts for:
 
 - `DMPO` baseline
 - `DynamicPO_DMPO` main experiment
@@ -87,7 +88,7 @@ Before running the scripts, please check the following variables:
 
 - `MODEL_NAME`: path or name of the base model
 - `SFT_CHECKPOINT`: path to the SFT checkpoint
-- `NEG_NUM`: number of negative samples, set to `15` in our main experiments
+- `NEG_NUM`: number of negative samples, set to **`15`** in our main experiments
 
 The scripts already contain the recommended training settings. In most cases, you only need to update `MODEL_NAME` and `SFT_CHECKPOINT`.
 
@@ -145,7 +146,7 @@ The second figure shows how the reward winner rate evolves during training for v
 
 ## Supplementary Multi-objective Experiments
 
-The supplementary exploratory study provides additional scripts for evaluating DynamicPO on other multi-negative preference optimization objectives. These experiments are not the main reproduction path of the paper, but they help readers examine whether the DynamicPO idea can generalize beyond the main DMPO setting.
+The supplementary exploratory study provides additional scripts for evaluating DynamicPO on other multi-negative preference optimization objectives. These experiments are **not the main reproduction path** of the paper, but they help readers examine whether the DynamicPO idea can **generalize beyond the main DMPO setting**.
 
 ### MPPO and S-DPO Extensions
 
@@ -219,17 +220,17 @@ Readers can also vary the number of negative samples, such as `1`, `3`, `5`, `10
 
 #### Observed Collapse Patterns
 
-In the supplementary exploratory study, we observed clear preference-optimization collapse phenomena in DMPO and MPPO. In contrast, we did not observe a similarly clear collapse pattern for S-DPO under the tested settings.
+In the supplementary exploratory study, we observed **clear preference-optimization collapse** phenomena in DMPO and MPPO. In contrast, we did **not observe a similarly clear collapse pattern** for S-DPO under the tested settings.
 
 #### Our Analysis of S-DPO
 
 Our current analysis is that the softmax-based objective in S-DPO may implicitly reduce the influence of model-discriminative negatives during optimization. These negatives have already been well separated by the model and therefore provide limited information for further preference-boundary refinement. We believe this may partially explain why a clearly visible collapse was not observed for S-DPO in the tested setting.
 
-At the same time, we do not interpret the absence of a clearly visible collapse as evidence that this objective is inherently better. In our experiments, applying DynamicPO to S-DPO still improves over vanilla S-DPO, suggesting that boundary-critical negatives remain useful for this objective as well. Meanwhile, DMPO and MPPO can achieve stronger performance once combined with DynamicPO under the same recommendation setting. Our view is that different multi-negative preference optimization objectives may have different strengths: some may appear more stable under larger negative sets, while others may benefit more from DynamicPO-style adaptive optimization once informative boundary negatives are properly identified.
+At the same time, we do **not interpret** the absence of a clearly visible collapse as evidence that this objective is inherently better. In our experiments, applying DynamicPO to S-DPO still improves over vanilla S-DPO, suggesting that **boundary-critical negatives** remain useful for this objective as well. Meanwhile, DMPO and MPPO can achieve stronger performance once combined with DynamicPO under the same recommendation setting. Our view is that different multi-negative preference optimization objectives may have different strengths: some may appear more stable under larger negative sets, while others may benefit more from DynamicPO-style adaptive optimization once informative boundary negatives are properly identified.
 
 #### Generalization of DynamicPO
 
-Overall, these results suggest that DynamicPO shows encouraging generalization capability across other multi-negative preference optimization objectives.
+Overall, these results suggest that DynamicPO shows **encouraging generalization capability** across other multi-negative preference optimization objectives.
 
 More broadly, these findings show that avoiding a clearly visible collapse and achieving the best final recommendation performance are related but not identical. An objective may appear more stable under certain settings, but still benefit from DynamicPO when boundary-critical negatives are dynamically identified and emphasized.
 
@@ -257,9 +258,9 @@ DynamicPO/
 
 ## Objective Functions
 
-The following equations are reference objective forms used in the implementation. Please refer to the paper for the full derivation.
+The following equations are reference objective forms used in the implementation. Please refer to their original papers for the full derivations.
 
-### DMPO
+### [DMPO](https://arxiv.org/abs/2406.14868)
 
 ```math
 \mathcal{L}_{\mathrm{DMPO}}(\pi_\theta; \pi_{\mathrm{ref}})
@@ -282,7 +283,7 @@ The following equations are reference objective forms used in the implementation
 \right]
 ```
 
-### MPPO
+### [MPPO](https://arxiv.org/abs/2412.15244)
 
 ```math
 \mathcal{L}_{\mathrm{MPPO}}(\pi_\theta)
@@ -300,7 +301,7 @@ N \cdot \pi_\theta(y_w \mid x)
 \right]
 ```
 
-### S-DPO
+### [S-DPO](https://arxiv.org/abs/2406.09215)
 
 ```math
 \mathcal{L}_{\mathrm{S-DPO}}(\pi_\theta; \pi_{\mathrm{ref}})
