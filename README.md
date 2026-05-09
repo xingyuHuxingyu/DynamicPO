@@ -216,19 +216,17 @@ For a clear comparison, we suggest reproducing each objective family as a pair:
 
 Readers can also vary the number of negative samples, such as `1`, `3`, `5`, `10`, and `15`, to examine how preference-optimization collapse changes under different multi-negative settings.
 
-### Key Observations
+### What We Learned from the Supplementary Experiments
 
-#### Observed Collapse Patterns
+#### Did DMPO, MPPO, and S-DPO exhibit the same collapse pattern?
 
 In the supplementary exploratory study, we observed **clear preference-optimization collapse** phenomena in DMPO and MPPO. In contrast, we did **not observe a similarly clear collapse pattern** for S-DPO under the tested settings.
 
-#### Our Analysis of S-DPO
+#### Does the absence of obvious collapse in S-DPO mean it is the best objective?
 
-Our current analysis is that the softmax-based objective in S-DPO may implicitly reduce the influence of model-discriminative negatives during optimization. These negatives have already been well separated by the model and therefore provide limited information for further preference-boundary refinement. We believe this may partially explain why a clearly visible collapse was not observed for S-DPO in the tested setting.
+Our current interpretation is that different multi-negative preference optimization objectives may respond differently to larger negative sets. In particular, the softmax-based objective in S-DPO may implicitly reduce the influence of model-discriminative negatives during optimization. These negatives have already been well separated by the model and therefore provide limited information for further preference-boundary refinement. We believe this may partially explain why a clearly visible collapse was not observed for S-DPO in the tested setting.
 
-At the same time, we do **not interpret** the absence of a clearly visible collapse as evidence that this objective is inherently better. In our experiments, applying DynamicPO to S-DPO still improves over vanilla S-DPO, suggesting that **boundary-critical negatives** remain useful for this objective as well. Meanwhile, DMPO and MPPO can achieve stronger performance once combined with DynamicPO under the same recommendation setting. Our view is that different multi-negative preference optimization objectives may have different strengths: some may appear more stable under larger negative sets, while others may benefit more from DynamicPO-style adaptive optimization once informative boundary negatives are properly identified.
-
-#### Generalization of DynamicPO
+At the same time, we do **not interpret** the absence of a clearly visible collapse as evidence that one objective is inherently better than the others. In our experiments, applying DynamicPO to S-DPO still improves over vanilla S-DPO, suggesting that **boundary-critical negatives** remain useful for this objective as well. Meanwhile, applying DynamicPO to DMPO or MPPO can achieve even stronger performance under the same recommendation setting. Our view is that different multi-negative preference optimization objectives may have different strengths: some may appear more stable under larger negative sets, while others may benefit more once DynamicPO is applied to better handle boundary-critical negatives and dynamic optimization-strength adjustment.
 
 Overall, these results suggest that DynamicPO shows **encouraging generalization capability** across other multi-negative preference optimization objectives.
 
@@ -237,8 +235,8 @@ More broadly, these findings show that avoiding a clearly visible collapse and a
 ## Future Directions
 
 - We believe the potential of dynamic-beta mechanisms for preference optimization in large language model based recommender systems has not yet been fully explored. We welcome future research in this direction, although a more complete investigation may require substantial compute resources.
-- We believe that DynamicPO-style mechanisms may also be applicable beyond recommendation, for example in natural dialogue and other large language model alignment scenarios that aim to better satisfy human preferences. At the same time, the dynamic-beta mechanism suitable for open-ended dialogue or instruction-following settings may differ from the one used in recommendation tasks, which deserves further investigation.
-- We also believe that generative recommendation is a promising direction for extending DynamicPO-style mechanisms, including combinations with GRPO or other preference-optimization objectives. In particular, recent open generative recommendation frameworks such as [MiniOneRec](https://arxiv.org/pdf/2510.24431) may provide a useful testbed for studying how DynamicPO-style ideas interact with generative recommendation pipelines, GenRec-style settings, and broader multi-negative preference optimization methods.
+- We believe that the two dynamic mechanisms in DynamicPO, namely dynamic boundary-negative selection and dynamic-beta adjustment, may also be applicable beyond recommendation, for example in natural dialogue and other large language model alignment scenarios that aim to better satisfy human preferences. At the same time, although [β-DPO](https://arxiv.org/abs/2407.08639) has already explored dynamic-beta mechanisms for natural question-answering settings, research on multi-negative dynamic-beta mechanisms in such settings is still far from comprehensive.
+- We also believe that generative recommendation is a promising direction for extending the two dynamic mechanisms in DynamicPO, including combinations with GRPO or other preference-optimization objectives. In particular, recent open generative recommendation frameworks such as [MiniOneRec](https://arxiv.org/pdf/2510.24431) may provide a useful testbed for studying how dynamic boundary-negative selection and dynamic-beta adjustment interact with generative recommendation pipelines, GenRec-style settings, and broader multi-negative preference optimization methods.
 
 ## Project Structure
 
