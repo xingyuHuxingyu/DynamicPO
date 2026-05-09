@@ -2,7 +2,7 @@
 
 > Code for "**DynamicPO: Dynamic Preference Optimization for Recommendation**"
 >
-> ![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)
+> [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html)
 
 DynamicPO is a lightweight, plug-and-play preference optimization framework for LLM-based recommender systems.
 
