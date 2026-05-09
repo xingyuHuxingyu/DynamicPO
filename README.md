@@ -6,17 +6,23 @@
 
 **DynamicPO** is a lightweight, plug-and-play preference optimization framework for LLM-based recommender systems.
 
-**Problem.** Recent multi-negative preference optimization methods suggest that using more negative samples can provide richer preference signals and improve recommendation performance. However, our empirical study reveals a counterintuitive phenomenon: when the number of negatives continues to increase, recommendation performance can degrade even though the training loss keeps decreasing. We refer to this as **preference optimization collapse**.
+### What is the problem?
 
-**Analysis.** We find that this collapse is caused by an imbalance between two types of negatives. After SFT, the model already has a coarse-grained ability to distinguish many negatives from positives. As a result, **model-discriminative negatives** dominate the aggregated optimization signal, while **boundary-critical negatives**, which are truly useful for refining user preference boundaries, are diluted and under-optimized.
+Recent multi-negative preference optimization methods suggest that using more negative samples can provide richer preference signals and improve recommendation performance. However, our empirical study reveals a counterintuitive phenomenon: when the number of negatives continues to increase, recommendation performance can degrade even though the training loss keeps decreasing. We refer to this as **preference optimization collapse**.
 
-**Key idea.** This analysis suggests three central observations:
+### Why does collapse happen?
+
+We find that this collapse is caused by an imbalance between two types of negatives. After SFT, the model already has a coarse-grained ability to distinguish many negatives from positives. As a result, **model-discriminative negatives** dominate the aggregated optimization signal, while **boundary-critical negatives**, which are truly useful for refining user preference boundaries, are diluted and under-optimized.
+
+### What does this suggest?
 
 - More negative samples do not always lead to better preference optimization.
 - **Model-discriminative negatives** can dominate the aggregated optimization signal, while **boundary-critical negatives** are under-emphasized.
 - Dynamically selecting **boundary-critical negatives** and adaptively adjusting their optimization strength can lead to more effective preference-boundary refinement.
 
-**DynamicPO.** To address this issue, DynamicPO dynamically selects **boundary-critical negatives** that are most helpful for decision-boundary refinement and adaptively adjusts the optimization strength for each selected negative. This enables more robust preference-boundary learning, effectively mitigates **preference optimization collapse**, and improves recommendation performance across multiple multi-negative preference optimization objectives with **negligible computational overhead**.
+### How does DynamicPO address it?
+
+To address this issue, DynamicPO dynamically selects **boundary-critical negatives** that are most helpful for decision-boundary refinement and adaptively adjusts the optimization strength for each selected negative. This enables more robust preference-boundary learning, effectively mitigates **preference optimization collapse**, and improves recommendation performance across multiple multi-negative preference optimization objectives with **negligible computational overhead**.
 
 ## Installation
 
@@ -107,6 +113,8 @@ You may append `&` to run the scripts in the background.
 A compact summary of the most important tables is shown below. The following tables report `HitRatio@1`.
 
 For the broader comparison setting, we follow previous research for the traditional and LLM-based baselines and report their results, particularly under the benchmark construction and evaluation protocols adopted in LLaRA and S-DPO. Please refer to our arXiv paper for the full main-experiment comparison.
+
+We have also recently reproduced our experiments on **NVIDIA H200** GPUs and are organizing the corresponding checkpoints for release on **Hugging Face**. In our recent runs, we found that results on H200 can even be slightly better than the A100-based results reported in the paper. Therefore, small reproduction differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
 
 ### Main Comparison
 
