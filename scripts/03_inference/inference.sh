@@ -2,6 +2,10 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
+cd "${REPO_ROOT}"
+
 CHECKPOINT_DIR="your_target_dir_such_as_./DynamicPO_DMPO/checkpoint-1122"
 CUDA_DEVICE=0
 BASE_MODEL="your_base_llm_model"

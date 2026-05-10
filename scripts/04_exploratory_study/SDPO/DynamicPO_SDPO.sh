@@ -2,6 +2,10 @@
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
+cd "${REPO_ROOT}"
+
 GPUS="0,1,2,3"
 NPROC_PER_NODE=4
 MASTER_PORT=$((25000 + RANDOM % 2000))

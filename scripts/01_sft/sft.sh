@@ -1,3 +1,11 @@
+#!/bin/bash
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
+cd "${REPO_ROOT}"
+
 # Position the number of processes specified after the --nproc_per_node flag
 OUTPUT_DIR="./lastfm-sft"
 mkdir -p $OUTPUT_DIR
