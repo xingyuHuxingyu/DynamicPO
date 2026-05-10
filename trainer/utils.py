@@ -10,6 +10,7 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import IterableDataset
 from transformers import DataCollatorForLanguageModeling, PreTrainedTokenizerBase, TrainerCallback
 
+random.seed(1958)
 
 class Prompt:
     def __init__(self, prompt_path) -> None:

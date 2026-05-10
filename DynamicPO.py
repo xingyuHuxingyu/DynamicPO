@@ -10,7 +10,7 @@ from trainer.dynamicpo_trainer import DPOTrainer
 from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from trainer.utils import Prompt
+from Prompt import Prompt
 import json
 import torch
 import bitsandbytes as bnb

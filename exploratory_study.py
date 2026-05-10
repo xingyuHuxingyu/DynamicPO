@@ -9,7 +9,7 @@ from peft import PeftModel, prepare_model_for_kbit_training
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
 
 from trainer.exploratory_study_trainer import DPOTrainer
-from trainer.utils import Prompt
+from Prompt import Prompt
 
 os.environ["WANDB_MODE"] = "disabled"
 random.seed(1958)

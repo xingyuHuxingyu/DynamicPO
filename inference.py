@@ -1,6 +1,6 @@
 from datasets import load_dataset
 from transformers import AutoModelForCausalLM, LlamaTokenizer, BitsAndBytesConfig, AutoTokenizer
-from trainer.utils import Prompt
+from Prompt import Prompt
 import torch
 from torch.utils.data import DataLoader
 import transformers
@@ -39,12 +39,14 @@ def inference( dataset="",
         model = PeftModel.from_pretrained(model, resume_from_checkpoint)
     model.eval()
 
-    if "Llama-3" in base_model:
+    if "Llama-3" in base_model or "Qwen" in base_model:
         tokenizer = AutoTokenizer.from_pretrained(base_model)
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
     else:
         tokenizer = LlamaTokenizer.from_pretrained(base_model)
-        
-    tokenizer.pad_token_id = (0)
+        tokenizer.pad_token_id = 0
+
     tokenizer.padding_side = "left"
     
 
@@ -65,11 +67,21 @@ def inference( dataset="",
         return dic
     
 
-    prompt_path = "prompt.txt" if external_prompt_path=="" else external_prompt_path
-    data_files = {
-        "test": "./data/lastfm-sft-cans20/lastfm-test.json"
-       # "test": "./data/goodreads-sft-cans20/goodreads-test.json",
-    }
+    prompt_path = "prompt.txt" if external_prompt_path == "" else external_prompt_path
+    if dataset == "lastfm":
+        data_files = {
+            "test": "./data/lastfm-sft-cans20/lastfm-test.json"
+        }
+    elif dataset == "goodreads":
+        data_files = {
+            "test": "./data/goodreads-sft-cans20/goodreads-test.json"
+        }
+    elif dataset == "steam":
+        data_files = {
+            "test": "./data/steam-sft-cans20/steam-test.json"
+        }
+    else:
+        raise ValueError(f"Unsupported dataset: {dataset}")
 
 
     data = load_dataset("json", data_files=data_files)
