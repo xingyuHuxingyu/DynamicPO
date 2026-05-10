@@ -15,6 +15,10 @@ os.environ["WANDB_MODE"] = "disabled"
 random.seed(1958)
 
 
+def _is_main_process() -> bool:
+    return int(os.environ.get("RANK", "0")) == 0
+
+
 def train(
     output_dir="./outputs/exploratory_study",
     model_name="",
@@ -35,14 +39,15 @@ def train(
     cutoff_len: int = 512,
     eval_step: int = 4,
 ):
-    print(f"custom_note: {custom_note}")
-    print(f"info_note: {info_note}")
-    print(f"beta: {beta}")
-    print(f"filter_mode: {filter_mode}")
-    print(f"loss_type: {loss_type}")
-    print(f"neg_num: {neg_num}")
-    print(f"batch_size: {batch_size}")
-    print(f"gradient_accumulation_steps: {gradient_accumulation_steps}")
+    if _is_main_process():
+        print(f"custom_note: {custom_note}")
+        print(f"info_note: {info_note}")
+        print(f"beta: {beta}")
+        print(f"filter_mode: {filter_mode}")
+        print(f"loss_type: {loss_type}")
+        print(f"neg_num: {neg_num}")
+        print(f"batch_size: {batch_size}")
+        print(f"gradient_accumulation_steps: {gradient_accumulation_steps}")
 
     if dataset == "lastfm":
         data_files = {
@@ -131,7 +136,8 @@ def train(
         resume_from_checkpoint,
         is_trainable=True,
     )
-    base_model.print_trainable_parameters()
+    if _is_main_process():
+        base_model.print_trainable_parameters()
 
     ref_enable = loss_type != "wo_ref" and filter_mode not in {
         "MPPO",
@@ -147,7 +153,8 @@ def train(
             quantization_config=bnb_config,
         )
         reference_model = PeftModel.from_pretrained(model_ref, resume_from_checkpoint)
-        reference_model.print_trainable_parameters()
+        if _is_main_process():
+            reference_model.print_trainable_parameters()
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     if "Llama-3" in model_name:

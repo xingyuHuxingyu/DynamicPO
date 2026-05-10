@@ -23,6 +23,10 @@ os.environ["WANDB_MODE"] = 'disabled'
 random.seed(1958)
 
 
+def _is_main_process() -> bool:
+    return int(os.environ.get("RANK", "0")) == 0
+
+
 def train(
     #train
     output_dir="./",
@@ -46,15 +50,15 @@ def train(
     cutoff_len: int = 512,
     eval_step = 4
 ):
-    
-    print(f"custom_note:{custom_note}")
-    print(f"info_note:{info_note}")
-    print(f"beta: {beta}")
-    print(f"filter_mode: {filter_mode}")
-    print(f"loss_type:{loss_type}")
-    print(f"neg_num: {neg_num}")
-    print(f"batch_size: {batch_size}")
-    print(f"gradient_accumulation_steps: {gradient_accumulation_steps}")
+    if _is_main_process():
+        print(f"custom_note:{custom_note}")
+        print(f"info_note:{info_note}")
+        print(f"beta: {beta}")
+        print(f"filter_mode: {filter_mode}")
+        print(f"loss_type:{loss_type}")
+        print(f"neg_num: {neg_num}")
+        print(f"batch_size: {batch_size}")
+        print(f"gradient_accumulation_steps: {gradient_accumulation_steps}")
     
     if dataset=="lastfm":
         data_files = {
@@ -114,8 +118,9 @@ def train(
     columns = data["train"].column_names
     train_data = data["train"].map(process_data, remove_columns=columns, \
                                     num_proc=8, batched=True).shuffle(seed=42)#.select(range(256))
-    for i in range(0,4):
-        print(train_data[i])
+    if _is_main_process():
+        for i in range(0, 4):
+            print(train_data[i])
 
     # random 2000 samples for validation
     val_data = data["validation"].map(process_data, remove_columns=columns, \
@@ -143,7 +148,8 @@ def train(
     base_model = prepare_model_for_kbit_training(base_model)
     base_model = PeftModel.from_pretrained(base_model, resume_from_checkpoint,#)#, 
                                         is_trainable=True)
-    base_model.print_trainable_parameters()
+    if _is_main_process():
+        base_model.print_trainable_parameters()
 
     ref_enable=loss_type not in ["wo_ref"]
     if ref_enable:
@@ -152,7 +158,8 @@ def train(
                                                   
                                                     quantization_config=bnb_config)
         reference_model = PeftModel.from_pretrained(model_ref, resume_from_checkpoint)
-        reference_model.print_trainable_parameters()
+        if _is_main_process():
+            reference_model.print_trainable_parameters()
 
 
 

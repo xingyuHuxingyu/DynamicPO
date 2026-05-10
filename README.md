@@ -193,10 +193,10 @@ The runnable entrypoint is `exploratory_study.py`, which uses `trainer/explorato
 Run one of the following scripts depending on the objective family you want to reproduce:
 
 ```bash
-sh ./scripts/04_exploratory_study/MPPO/MPPO.sh
-sh ./scripts/04_exploratory_study/MPPO/DynamicPO_MPPO.sh
-sh ./scripts/04_exploratory_study/SDPO/SDPO.sh
-sh ./scripts/04_exploratory_study/SDPO/DynamicPO_SDPO.sh
+sh ./scripts/exploratory_study/MPPO/MPPO.sh
+sh ./scripts/exploratory_study/MPPO/DynamicPO_MPPO.sh
+sh ./scripts/exploratory_study/SDPO/SDPO.sh
+sh ./scripts/exploratory_study/SDPO/DynamicPO_SDPO.sh
 ```
 
 These scripts correspond to:
@@ -263,7 +263,7 @@ DynamicPO/
 │   ├── 01_sft/
 │   ├── 02_preference_optimization/
 │   ├── 03_inference/
-│   └── 04_exploratory_study/
+│   └── exploratory_study/
 ├── trainer/
 ├── DynamicPO.py
 └── exploratory_study.py

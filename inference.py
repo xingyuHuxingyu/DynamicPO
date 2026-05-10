@@ -1,5 +1,5 @@
 from datasets import load_dataset
-from transformers import LlamaForCausalLM, LlamaTokenizer, BitsAndBytesConfig, AutoTokenizer
+from transformers import AutoModelForCausalLM, LlamaTokenizer, BitsAndBytesConfig, AutoTokenizer
 from trainer.utils import Prompt
 import torch
 from torch.utils.data import DataLoader
@@ -29,7 +29,7 @@ def inference( dataset="",
     )
     device_index = Accelerator().process_index
     device_map = {"": device_index}
-    model = LlamaForCausalLM.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         base_model,
         device_map=device_map,
         quantization_config=bnb_config,
