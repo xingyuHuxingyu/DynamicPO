@@ -4,27 +4,27 @@
 >
 > [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html)
 
-**DynamicPO** is a plug-and-play dynamic preference optimization framework for LLM-based recommender systems. It mitigates preference optimization collapse in multi-negative alignment by dynamically identifying boundary-critical negatives and calibrating sample-level optimization strength.
+## Preference Optimization Collapse in Multi-Negative Alignment
 
-### What is the problem?
+DynamicPO is a plug-and-play dynamic preference optimization framework for LLM-based recommender systems. It mitigates preference optimization collapse by dynamically identifying boundary-critical negatives and calibrating sample-level optimization strength.
 
-Recent multi-negative preference optimization methods suggest that using more negative samples can provide richer preference signals and improve recommendation performance. However, our empirical study reveals a counterintuitive phenomenon: when the number of negatives continues to increase, recommendation performance can degrade even though the training loss keeps decreasing. We refer to this as **preference optimization collapse**.
+Existing multi-negative preference optimization methods often assume that more negative samples provide richer preference supervision. However, our empirical study reveals a counterintuitive phenomenon: when the number of negatives continues to increase, recommendation performance can degrade even though the training loss keeps decreasing. We refer to this phenomenon as preference optimization collapse.
 
-### Why does collapse happen?
+## Lower Loss, Worse Recommendation: SFT-Induced Negative Imbalance
 
-We find that this collapse is caused by an imbalance between two types of negatives. After SFT, the model already has a coarse-grained ability to distinguish many negatives from positives. As a result, **model-discriminative negatives** dominate the aggregated optimization signal, while **boundary-critical negatives**, which are truly useful for refining user preference boundaries, are diluted and under-optimized.
+We find that this collapse is closely related to the negative imbalance induced by supervised fine-tuning. Although SFT does not explicitly perform positive-negative preference ranking, it already gives the model a coarse-grained ability to capture user interests. As a result, before preference optimization begins, many randomly sampled negatives have already been clearly separated from positives.
 
-### What does this suggest?
+These model-discriminative negatives can dominate the aggregated optimization signal in multi-negative objectives and continue to drive the training loss downward. However, they provide limited information for refining fine-grained user preference boundaries. In contrast, boundary-critical negatives, which stay close to the current preference boundary or even violate the expected preference order, are more informative but can be diluted and under-optimized as the number of negatives increases.
 
-- More negative samples do not always lead to better preference optimization.
-- **Model-discriminative negatives** can dominate the aggregated optimization signal, while **boundary-critical negatives** are under-emphasized.
-- Dynamically selecting **boundary-critical negatives** and adaptively adjusting their optimization strength can lead to more effective preference-boundary refinement.
+## DynamicPO: Boundary-Aware Dynamic Preference Optimization
 
-### How does DynamicPO address it?
+DynamicPO addresses this issue by refocusing multi-negative preference optimization on boundary-critical negatives. It first prioritizes preference-violation negatives and then uses likelihood-based clustering to identify near-boundary negatives when no violation exists.
 
-To address this issue, DynamicPO dynamically selects **boundary-critical negatives** that are most helpful for decision-boundary refinement and adaptively adjusts the optimization strength for each selected negative. This enables more robust preference-boundary learning, effectively mitigates **preference optimization collapse**, and improves recommendation performance across multiple multi-negative preference optimization objectives with **negligible computational overhead**.
+DynamicPO further applies dual-margin dynamic β adjustment to calibrate the optimization strength for each selected negative according to its boundary ambiguity. In this way, DynamicPO prevents optimization from being dominated by already separated negatives and enables more stable preference-boundary refinement.
 
-Specifically, DynamicPO first prioritizes **preference-violation negatives** and then uses **likelihood-based clustering** to capture near-boundary negatives when no violation exists.
+## Lightweight and Plug-and-Play
+
+DynamicPO can be applied to multiple multi-negative preference optimization objectives with negligible additional computational overhead. Experiments show that it effectively mitigates preference optimization collapse and improves recommendation performance across different LLM-based recommender settings.
 
 ## Installation
 
