@@ -1,8 +1,10 @@
 # DynamicPO
 
-> Code for "**DynamicPO: Dynamic Preference Optimization for Recommendation**"
+> Official implementation of "**DynamicPO: Dynamic Preference Optimization for Recommendation**"
 >
 > [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![Hugging Face Paper](https://img.shields.io/badge/Hugging%20Face-Paper-yellow)](https://huggingface.co/papers/2605.00327)
+>
+> [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data) [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
 ## Preference Optimization Collapse in Multi-Negative Alignment
 
@@ -59,16 +61,12 @@ Our data preprocessing and construction pipeline follows prior LLM-based recomme
 Currently, we provide the processed **LastFM** data for quick reproduction.
 We recommend that future researchers use **LastFM** first when validating their ideas and reproducing the pipeline, and only then move to **Goodreads** and **Steam**, since these two datasets usually require more computation than **LastFM**.
 
-For convenience, we also release the processed dataset on Hugging Face: [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data)
-
 ## Quick Start
 
 The main experiment in this repository is the **DMPO-based DynamicPO pipeline**. We provide separate scripts for:
 
 - `DMPO` baseline
 - `DynamicPO_DMPO` main experiment
-
-We also provide released model artifacts on Hugging Face: [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
 ### Step 1. Supervised Fine-tuning (SFT)
 
