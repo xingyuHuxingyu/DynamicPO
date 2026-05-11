@@ -113,10 +113,11 @@ def train(
     base_model.config.use_cache = False
     base_model = prepare_model_for_kbit_training(base_model)
 
-    if 'Llama-3' in model_name:
+    if 'Llama-3' in model_name or 'Qwen' in model_name:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        tokenizer.pad_token = tokenizer.eos_token
-        print("Llama-3!")
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+        print("AutoTokenizer for Llama-3/Qwen!")
     else:
         tokenizer = LlamaTokenizer.from_pretrained(model_name)
         tokenizer.pad_token_id = (0)

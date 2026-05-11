@@ -2,9 +2,7 @@
 
 > Official implementation of "**DynamicPO: Dynamic Preference Optimization for Recommendation**"
 >
-> [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![Hugging Face Paper](https://img.shields.io/badge/Hugging%20Face-Paper-yellow)](https://huggingface.co/papers/2605.00327)
->
-> [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data) [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
+> [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![Hugging Face Paper](https://img.shields.io/badge/Hugging%20Face-Paper-yellow)](https://huggingface.co/papers/2605.00327) [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data) [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
 ## Preference Optimization Collapse in Multi-Negative Alignment
 
@@ -233,17 +231,17 @@ Readers can also vary the number of negative samples, such as `1`, `3`, `5`, `10
 
 #### Did DMPO, MPPO, and S-DPO exhibit the same collapse pattern?
 
-In the supplementary exploratory study, we observed **clear preference-optimization collapse** phenomena in DMPO and MPPO. In contrast, we did **not observe a similarly clear collapse pattern** for S-DPO under the tested settings.
+In the supplementary exploratory study, we observed **clear preference-optimization collapse** phenomena in DMPO and MPPO. Among them, **DMPO exhibits the most severe collapse pattern**, while **MPPO shows a stage-wise declining oscillation** as the number of negative samples increases. In contrast, we did **not observe a similarly clear collapse pattern** for S-DPO under the tested settings.
 
 #### Does the absence of obvious collapse in S-DPO mean it is the best objective?
 
-Our current interpretation is that different multi-negative preference optimization objectives may respond differently to larger negative sets. In particular, the softmax-based objective in S-DPO may implicitly reduce the influence of model-discriminative negatives during optimization. These negatives have already been well separated by the model and therefore provide limited information for further preference-boundary refinement. We believe this may partially explain why a clearly visible collapse was not observed for S-DPO in the tested setting.
+- Our current interpretation is that different multi-negative preference optimization objectives may respond differently to larger negative sets. In particular, the softmax-based objective in S-DPO may implicitly reduce the influence of model-discriminative negatives during optimization. These negatives have already been well separated by the model and therefore provide limited information for further preference-boundary refinement. We believe this may partially explain why a clearly visible collapse was not observed for S-DPO in the tested setting.
 
-At the same time, we do **not interpret** the absence of a clearly visible collapse as evidence that one objective is inherently better than the others. In our experiments, applying DynamicPO to S-DPO still improves over vanilla S-DPO, suggesting that **boundary-critical negatives** remain useful for this objective as well. Meanwhile, applying DynamicPO to DMPO or MPPO can achieve even stronger performance under the same recommendation setting. Our view is that different multi-negative preference optimization objectives may have different strengths: some may appear more stable under larger negative sets, while others may benefit more once DynamicPO is applied to better handle boundary-critical negatives and dynamic optimization-strength adjustment.
+- At the same time, we do **not interpret** the absence of a clearly visible collapse as evidence that one objective is inherently better than the others.
 
-Overall, these results suggest that DynamicPO shows **encouraging generalization capability** across other multi-negative preference optimization objectives.
+- In our experiments, applying DynamicPO to S-DPO still improves over vanilla S-DPO, suggesting that **boundary-critical negatives** remain useful for this objective as well. Meanwhile, applying DynamicPO to DMPO or MPPO can achieve even stronger performance under the same recommendation setting. Our view is that different multi-negative preference optimization objectives may have different strengths: some may appear more stable under larger negative sets, while others may benefit more once DynamicPO is applied to better handle boundary-critical negatives and dynamic optimization-strength adjustment.
 
-More broadly, these findings show that avoiding a clearly visible collapse and achieving the best final recommendation performance are related but not identical. An objective may appear more stable under certain settings, but still benefit from DynamicPO when boundary-critical negatives are dynamically identified and emphasized.
+- Overall, these results suggest that DynamicPO shows **encouraging generalization capability** across other multi-negative preference optimization objectives. More broadly, these findings show that avoiding a clearly visible collapse and achieving the best final recommendation performance are related but not identical. An objective may appear more stable under certain settings, but still benefit from DynamicPO when boundary-critical negatives are dynamically identified and emphasized.
 
 ## Future Directions
 
