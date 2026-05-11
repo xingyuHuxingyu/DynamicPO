@@ -163,9 +163,10 @@ def train(
 
 
 
-    if 'Llama-3' in model_name:
+    if 'Llama-3' in model_name or 'Qwen' in model_name:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        tokenizer.pad_token = tokenizer.eos_token
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
     else:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         tokenizer.pad_token_id = (0)
