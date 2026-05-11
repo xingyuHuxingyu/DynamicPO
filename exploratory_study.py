@@ -1,5 +1,6 @@
 import os
 import random
+import re
 
 import fire
 import torch
@@ -17,6 +18,21 @@ random.seed(1958)
 
 def _is_main_process() -> bool:
     return int(os.environ.get("RANK", "0")) == 0
+
+
+def _model_name_to_slug(model_name: str) -> str:
+    base_name = os.path.basename(model_name.rstrip("/")) or "model"
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", base_name).strip("-").lower()
+    return slug or "model"
+
+
+def _append_model_suffix(value: str, model_name: str) -> str:
+    if not value:
+        return value
+    slug = _model_name_to_slug(model_name)
+    if slug in value.lower():
+        return value
+    return f"{value.rstrip('/')}_{slug}"
 
 
 def train(
@@ -39,6 +55,9 @@ def train(
     cutoff_len: int = 512,
     eval_step: int = 4,
 ):
+    output_dir = _append_model_suffix(output_dir, model_name)
+    wandb_name = _append_model_suffix(wandb_name, model_name)
+
     if _is_main_process():
         print(f"custom_note: {custom_note}")
         print(f"info_note: {info_note}")
@@ -48,6 +67,8 @@ def train(
         print(f"neg_num: {neg_num}")
         print(f"batch_size: {batch_size}")
         print(f"gradient_accumulation_steps: {gradient_accumulation_steps}")
+        print(f"output_dir: {output_dir}")
+        print(f"wandb_name: {wandb_name}")
 
     if dataset == "lastfm":
         data_files = {

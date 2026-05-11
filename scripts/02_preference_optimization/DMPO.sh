@@ -35,6 +35,14 @@ INFO_NOTE=""
 OUTPUT_DIR="./DMPO/dmpo_neg_${NEG_NUM}_beta_${BETA}"
 WANDB_NAME="dmpo_neg_${NEG_NUM}_beta_${BETA}_bs_${BATCH_SIZE}_ga_${GRAD_ACC}"
 
+model_name_to_slug() {
+    basename "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g'
+}
+
+MODEL_SLUG="$(model_name_to_slug "${MODEL_NAME}")"
+OUTPUT_DIR="${OUTPUT_DIR}_${MODEL_SLUG}"
+WANDB_NAME="${WANDB_NAME}_${MODEL_SLUG}"
+
 mkdir -p "${OUTPUT_DIR}"
 
 CUDA_VISIBLE_DEVICES=${GPUS} torchrun --nproc_per_node ${NPROC_PER_NODE} --master_port=${MASTER_PORT} DynamicPO.py \

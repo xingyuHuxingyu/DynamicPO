@@ -22,6 +22,21 @@ os.environ['WANDB_MODE']='disabled'
 import random
 random.seed(1958)
 
+
+def _model_name_to_slug(model_name: str) -> str:
+    base_name = os.path.basename(model_name.rstrip("/")) or "model"
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", base_name).strip("-").lower()
+    return slug or "model"
+
+
+def _append_model_suffix(value: str, model_name: str) -> str:
+    if not value:
+        return value
+    slug = _model_name_to_slug(model_name)
+    if slug in value.lower():
+        return value
+    return f"{value.rstrip('/')}_{slug}"
+
 def train(
         
     # path
@@ -43,6 +58,9 @@ def train(
     eval_step = 0.05,  
 
 ):
+    output_dir = _append_model_suffix(output_dir, model_name)
+    wandb_name = _append_model_suffix(wandb_name, model_name)
+
     os.environ['WANDB_PROJECT'] = wandb_project
     def convert_dict_to_prompt(d:dict):
         t = Prompt(prompt_path)

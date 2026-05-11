@@ -26,6 +26,14 @@ EVAL_STEP="0.033"
 OUTPUT_DIR="./outputs/exploratory_study/dynamicpo_mppo"
 WANDB_NAME="exploratory_dynamicpo_mppo"
 
+model_name_to_slug() {
+    basename "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g'
+}
+
+MODEL_SLUG="$(model_name_to_slug "${MODEL_NAME}")"
+OUTPUT_DIR="${OUTPUT_DIR}_${MODEL_SLUG}"
+WANDB_NAME="${WANDB_NAME}_${MODEL_SLUG}"
+
 mkdir -p "${OUTPUT_DIR}"
 
 CUDA_VISIBLE_DEVICES=${GPUS} torchrun --nproc_per_node ${NPROC_PER_NODE} --master_port=${MASTER_PORT} exploratory_study.py \
