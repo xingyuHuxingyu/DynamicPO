@@ -316,7 +316,30 @@ N \cdot \pi_\theta(y_w \mid x)
 
 ### [S-DPO](https://arxiv.org/abs/2406.09215)
 
-We follow the S-DPO objective from the original paper and extend it with DynamicPO in the supplementary multi-objective experiments. Please refer to the original paper and our implementation for the exact objective.
+```math
+\mathcal{L}_{\mathrm{S\text{-}DPO}}(\pi_\theta; \pi_{\mathrm{ref}})
+=
+-
+\mathbb{E}_{(x_u, e_p, \mathcal{E}_d) \sim \mathcal{D}}
+\left[
+\log \sigma
+\left(
+-
+\log
+\sum_{e_d \in \mathcal{E}_d}
+\exp
+\left(
+\beta \log
+\frac{\pi_\theta(e_d \mid x_u)}
+{\pi_{\mathrm{ref}}(e_d \mid x_u)}
+-
+\beta \log
+\frac{\pi_\theta(e_p \mid x_u)}
+{\pi_{\mathrm{ref}}(e_p \mid x_u)}
+\right)
+\right)
+\right]
+```
 
 ## Citation
 
