@@ -55,9 +55,11 @@ unzip lastfm-sft-cans20.zip
 After extraction, the processed LastFM data will be available under `./data/`.
 The extracted files include the processed splits used for supervised fine-tuning, preference optimization, and evaluation.
 
-Our data preprocessing and construction pipeline follows prior LLM-based recommendation work, mainly based on [LLaRA](https://arxiv.org/pdf/2312.02445) and [S-DPO](https://arxiv.org/pdf/2406.09215).
+Our data preprocessing and construction pipeline follows prior LLM-based recommendation work, mainly based on [LLaRA](https://arxiv.org/pdf/2312.02445). In particular, our data-related processing and negative sampling strategy are consistent with [S-DPO](https://arxiv.org/pdf/2406.09215).
 Currently, we provide the processed **LastFM** data for quick reproduction.
 We recommend that future researchers use **LastFM** first when validating their ideas and reproducing the pipeline, and only then move to **Goodreads** and **Steam**, since these two datasets usually require more computation than **LastFM**.
+
+For convenience, we also release the processed dataset on Hugging Face. The following link points to the uploaded data files used for reproduction:
 
 [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data)
 
@@ -67,6 +69,8 @@ The main experiment in this repository is the **DMPO-based DynamicPO pipeline**.
 
 - `DMPO` baseline
 - `DynamicPO_DMPO` main experiment
+
+We also provide released model artifacts on Hugging Face. The following link points to the uploaded model/checkpoint resources associated with this repository:
 
 [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
