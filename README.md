@@ -59,9 +59,7 @@ Our data preprocessing and construction pipeline follows prior LLM-based recomme
 Currently, we provide the processed **LastFM** data for quick reproduction.
 We recommend that future researchers use **LastFM** first when validating their ideas and reproducing the pipeline, and only then move to **Goodreads** and **Steam**, since these two datasets usually require more computation than **LastFM**.
 
-For convenience, we also release the processed dataset on Hugging Face. The following link points to the uploaded data files used for reproduction:
-
-[![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data)
+For convenience, we also release the processed dataset on Hugging Face: [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data)
 
 ## Quick Start
 
@@ -70,9 +68,7 @@ The main experiment in this repository is the **DMPO-based DynamicPO pipeline**.
 - `DMPO` baseline
 - `DynamicPO_DMPO` main experiment
 
-We also provide released model artifacts on Hugging Face. The following link points to the uploaded model/checkpoint resources associated with this repository:
-
-[![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
+We also provide released model artifacts on Hugging Face: [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
 ### Step 1. Supervised Fine-tuning (SFT)
 
