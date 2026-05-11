@@ -2,7 +2,7 @@
 
 > Code for "**DynamicPO: Dynamic Preference Optimization for Recommendation**"
 >
-> [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![HF Paper](https://img.shields.io/badge/HF-Paper-yellow)](https://huggingface.co/papers/2605.00327)
+> [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![Hugging Face Paper](https://img.shields.io/badge/Hugging%20Face-Paper-yellow)](https://huggingface.co/papers/2605.00327)
 
 ## Preference Optimization Collapse in Multi-Negative Alignment
 
