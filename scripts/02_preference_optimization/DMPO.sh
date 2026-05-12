@@ -39,7 +39,16 @@ model_name_to_slug() {
     basename "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g'
 }
 
+note_to_slug() {
+    echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g'
+}
+
+CUSTOM_SLUG="$(note_to_slug "${CUSTOM_NOTE}")"
 MODEL_SLUG="$(model_name_to_slug "${MODEL_NAME}")"
+if [ -n "${CUSTOM_SLUG}" ]; then
+    OUTPUT_DIR="${OUTPUT_DIR}_${CUSTOM_SLUG}"
+    WANDB_NAME="${WANDB_NAME}_${CUSTOM_SLUG}"
+fi
 OUTPUT_DIR="${OUTPUT_DIR}_${MODEL_SLUG}"
 WANDB_NAME="${WANDB_NAME}_${MODEL_SLUG}"
 

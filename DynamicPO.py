@@ -42,6 +42,20 @@ def _append_model_suffix(value: str, model_name: str) -> str:
     return f"{value.rstrip('/')}_{slug}"
 
 
+def _note_to_slug(note: str) -> str:
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", note).strip("-").lower()
+    return slug
+
+
+def _append_note_suffix(value: str, note: str) -> str:
+    if not value or not note:
+        return value
+    slug = _note_to_slug(note)
+    if not slug or slug in value.lower():
+        return value
+    return f"{value.rstrip('/')}_{slug}"
+
+
 def train(
     #train
     output_dir="./",
@@ -65,6 +79,8 @@ def train(
     cutoff_len: int = 512,
     eval_step = 4
 ):
+    output_dir = _append_note_suffix(output_dir, custom_note)
+    wandb_name = _append_note_suffix(wandb_name, custom_note)
     output_dir = _append_model_suffix(output_dir, model_name)
     wandb_name = _append_model_suffix(wandb_name, model_name)
 

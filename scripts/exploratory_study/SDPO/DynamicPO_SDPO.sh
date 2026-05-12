@@ -30,7 +30,17 @@ model_name_to_slug() {
     basename "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g'
 }
 
+note_to_slug() {
+    echo "$1" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g'
+}
+
+CUSTOM_NOTE="exploratory study"
+CUSTOM_SLUG="$(note_to_slug "${CUSTOM_NOTE}")"
 MODEL_SLUG="$(model_name_to_slug "${MODEL_NAME}")"
+if [ -n "${CUSTOM_SLUG}" ]; then
+    OUTPUT_DIR="${OUTPUT_DIR}_${CUSTOM_SLUG}"
+    WANDB_NAME="${WANDB_NAME}_${CUSTOM_SLUG}"
+fi
 OUTPUT_DIR="${OUTPUT_DIR}_${MODEL_SLUG}"
 WANDB_NAME="${WANDB_NAME}_${MODEL_SLUG}"
 
@@ -43,7 +53,7 @@ CUDA_VISIBLE_DEVICES=${GPUS} torchrun --nproc_per_node ${NPROC_PER_NODE} --maste
   --dataset "${DATASET}" \
   --resume_from_checkpoint "${SFT_CHECKPOINT}" \
   --wandb_name "${WANDB_NAME}" \
-  --custom_note "exploratory study" \
+  --custom_note "${CUSTOM_NOTE}" \
   --info_note "DynamicPO-SDPO" \
   --beta ${BETA} \
   --filter_mode "DynamicPO_SDPO" \
