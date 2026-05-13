@@ -5,7 +5,7 @@
 > [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![Hugging Face Paper](https://img.shields.io/badge/Hugging%20Face-Paper-yellow)](https://huggingface.co/papers/2605.00327) [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data) [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
 > [!NOTE]
-> 2026.5.13: We are currently reproducing the main experiments and supplementary experiments on NVIDIA H200 GPUs, while the results reported in the paper are based on A100 GPUs. We are also organizing the model checkpoints, and the Hugging Face model page is still being updated. We expect the upload process to be completed within this week.
+> 2026.5.13: We are currently reproducing the main experiments and supplementary experiments on NVIDIA H200 GPUs with CUDA 13.1 (nvcc 13.1.80), while the results reported in the paper are based on A100 GPUs. We are also organizing the model checkpoints, and the Hugging Face model page is still being updated. We expect the upload process to be completed within this week.
 
 ## Preference Optimization Collapse in Multi-Negative Alignment
 
