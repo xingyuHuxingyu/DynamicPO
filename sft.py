@@ -121,24 +121,40 @@ def train(
     device_index = Accelerator().process_index
     device_map = {"": device_index}
 
-    if 'Llama-3' in model_name:
-        base_model=AutoModelForCausalLM.from_pretrained(model_name, device_map=device_map, \
-                                                        quantization_config=bnb_config)
+    if "Llama-3" in model_name:
+        base_model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map=device_map,
+            quantization_config=bnb_config,
+        )
         print("Llama-3!")
+    elif "Qwen" in model_name:
+        base_model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map=device_map,
+            quantization_config=bnb_config,
+        )
+        print("Qwen!")
     else:
-        base_model = AutoModelForCausalLM.from_pretrained(model_name, device_map=device_map, \
-                                                  quantization_config=bnb_config)
+        base_model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map=device_map,
+            quantization_config=bnb_config,
+        )
     base_model.config.use_cache = False
     base_model = prepare_model_for_kbit_training(base_model)
 
-    if 'Llama-3' in model_name or 'Qwen' in model_name:
+    if "Llama-3" in model_name:
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        print("Llama-3!")
+    elif "Qwen" in model_name:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
-        print("AutoTokenizer for Llama-3/Qwen!")
+        print("Qwen!")
     else:
         tokenizer = LlamaTokenizer.from_pretrained(model_name)
-        tokenizer.pad_token_id = (0)
+    tokenizer.pad_token_id = (0)
         
     
     tokenizer.padding_side = "left"  # Fix weird overflow issue with fp16 training

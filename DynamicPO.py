@@ -177,9 +177,24 @@ def train(
     )
 
 
-    base_model = AutoModelForCausalLM.from_pretrained(model_name, 
-                                                device_map=device_map, 
-                                                quantization_config=bnb_config)
+    if "Llama-3" in model_name:
+        base_model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map=device_map,
+            quantization_config=bnb_config,
+        )
+    elif "Qwen" in model_name:
+        base_model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map=device_map,
+            quantization_config=bnb_config,
+        )
+    else:
+        base_model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map=device_map,
+            quantization_config=bnb_config,
+        )
     base_model.config.use_cache = False
     base_model = prepare_model_for_kbit_training(base_model)
     base_model = PeftModel.from_pretrained(base_model, resume_from_checkpoint,#)#, 
@@ -189,23 +204,39 @@ def train(
 
     ref_enable=loss_type not in ["wo_ref"]
     if ref_enable:
-        model_ref = AutoModelForCausalLM.from_pretrained(model_name,
-                                                    device_map=device_map, 
-                                                  
-                                                    quantization_config=bnb_config)
+        if "Llama-3" in model_name:
+            model_ref = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                device_map=device_map,
+                quantization_config=bnb_config,
+            )
+        elif "Qwen" in model_name:
+            model_ref = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                device_map=device_map,
+                quantization_config=bnb_config,
+            )
+        else:
+            model_ref = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                device_map=device_map,
+                quantization_config=bnb_config,
+            )
         reference_model = PeftModel.from_pretrained(model_ref, resume_from_checkpoint)
         if _is_main_process():
             reference_model.print_trainable_parameters()
 
 
 
-    if 'Llama-3' in model_name or 'Qwen' in model_name:
+    if "Llama-3" in model_name:
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+    elif "Qwen" in model_name:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
     else:
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
-        tokenizer.pad_token_id = (0)
+        tokenizer = LlamaTokenizer.from_pretrained(model_name)
+    tokenizer.pad_token_id = (0)
     tokenizer.padding_side = "left"  
 
     training_args = TrainingArguments(
