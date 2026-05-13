@@ -19,6 +19,8 @@ def evaluate(
     val_data,
     batch_size: int = 32
 ):
+    model_name = getattr(tokenizer, "name_or_path", "") or getattr(model.config, "_name_or_path", "")
+    use_token_level_slice = "llama-3" in model_name.lower()
     
     def output_generate(
         prompts,
@@ -38,9 +40,12 @@ def evaluate(
             output_scores = True,
             max_new_tokens = 20
         )
-        prompt_token_count = inputs["input_ids"].shape[1]
-        generated_tokens = generation_output.sequences[:, prompt_token_count:]
-        output = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
+        if use_token_level_slice:
+            prompt_token_count = inputs["input_ids"].shape[1]
+            generated_tokens = generation_output.sequences[:, prompt_token_count:]
+            output = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
+        else:
+            output = tokenizer.batch_decode(generation_output.sequences, skip_special_tokens=True)
         output = [_.strip() for _ in output]
         return output
     
@@ -65,7 +70,10 @@ def evaluate(
         batch_targets = targets[start:end]
         batch_cans = cans[start:end]
         for input_text, output, target, candidates in zip(batch_inputs, outputs, batch_targets, batch_cans):
-            selection = output
+            if use_token_level_slice:
+                selection = output
+            else:
+                selection = output[len(input_text):]
             num_cans = sum([1 for can in candidates if can in selection])  
             print(input_text)
             print(candidates)
