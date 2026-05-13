@@ -41,13 +41,14 @@ def inference( dataset="",
 
     if "Llama-3" in base_model:
         tokenizer = AutoTokenizer.from_pretrained(base_model)
+        tokenizer.pad_token_id = 0
     elif "Qwen" in base_model:
         tokenizer = AutoTokenizer.from_pretrained(base_model)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
     else:
         tokenizer = LlamaTokenizer.from_pretrained(base_model)
-    tokenizer.pad_token_id = 0
+        tokenizer.pad_token_id = 0
 
     tokenizer.padding_side = "left"
     

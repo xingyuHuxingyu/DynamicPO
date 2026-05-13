@@ -146,6 +146,7 @@ def train(
 
     if "Llama-3" in model_name:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer.pad_token_id = 0
         print("Llama-3!")
     elif "Qwen" in model_name:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -154,7 +155,7 @@ def train(
         print("Qwen!")
     else:
         tokenizer = LlamaTokenizer.from_pretrained(model_name)
-    tokenizer.pad_token_id = (0)
+        tokenizer.pad_token_id = 0
         
     
     tokenizer.padding_side = "left"  # Fix weird overflow issue with fp16 training
