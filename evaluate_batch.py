@@ -20,7 +20,8 @@ def evaluate(
     batch_size: int = 32
 ):
     model_name = getattr(tokenizer, "name_or_path", "") or getattr(model.config, "_name_or_path", "")
-    use_token_level_slice = "llama-3" in model_name.lower()
+    normalized_model_name = model_name.lower()
+    use_token_level_slice = "llama-3" in normalized_model_name or "qwen" in normalized_model_name
     
     def output_generate(
         prompts,
