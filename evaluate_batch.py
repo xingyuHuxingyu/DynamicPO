@@ -38,8 +38,9 @@ def evaluate(
             output_scores = True,
             max_new_tokens = 20
         )
-        s = generation_output.sequences
-        output = tokenizer.batch_decode(s,skip_special_tokens=True)
+        prompt_token_count = inputs["input_ids"].shape[1]
+        generated_tokens = generation_output.sequences[:, prompt_token_count:]
+        output = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
         output = [_.strip() for _ in output]
         return output
     
@@ -64,7 +65,7 @@ def evaluate(
         batch_targets = targets[start:end]
         batch_cans = cans[start:end]
         for input_text, output, target, candidates in zip(batch_inputs, outputs, batch_targets, batch_cans):
-            selection = output[len(input_text):]
+            selection = output
             num_cans = sum([1 for can in candidates if can in selection])  
             print(input_text)
             print(candidates)
