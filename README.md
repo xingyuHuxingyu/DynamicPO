@@ -7,38 +7,40 @@
 > [!NOTE]
 > 2026.5.13: We are currently reproducing the main experiments and supplementary experiments on NVIDIA H200 GPUs with CUDA 13.1 (nvcc 13.1.80), while the results reported in the paper are based on A100 GPUs. We are also organizing the model checkpoints, and the Hugging Face model page is still being updated. We expect the upload process to be completed within this week.
 
-## Preference Optimization Collapse in Multi-Negative Alignment
+## 1. Summary of Paper
+
+### 1.1 Preference Optimization Collapse in Multi-Negative Alignment
 
 DynamicPO is a plug-and-play dynamic preference optimization framework for LLM-based recommender systems. It mitigates preference optimization collapse by dynamically identifying boundary-critical negatives and calibrating sample-level optimization strength.
 
 Existing multi-negative preference optimization methods often assume that more negative samples provide richer preference supervision. However, our empirical study reveals a counterintuitive phenomenon: when the number of negatives continues to increase, recommendation performance can degrade even though the training loss keeps decreasing. We refer to this phenomenon as preference optimization collapse.
 
-## Lower Loss, Worse Recommendation: SFT-Induced Negative Imbalance
+### 1.2 Lower Loss, Worse Recommendation: SFT-Induced Negative Imbalance
 
 We find that this collapse is closely related to the negative imbalance induced by supervised fine-tuning. Although SFT does not explicitly perform positive-negative preference ranking, it already gives the model a coarse-grained ability to capture user interests. As a result, before preference optimization begins, many randomly sampled negatives have already been clearly separated from positives.
 
 These model-discriminative negatives can dominate the aggregated optimization signal in multi-negative objectives and continue to drive the training loss downward. However, they provide limited information for refining fine-grained user preference boundaries. In contrast, boundary-critical negatives, which stay close to the current preference boundary or even violate the expected preference order, are more informative but can be diluted and under-optimized as the number of negatives increases.
 
-## DynamicPO: Boundary-Aware Dynamic Preference Optimization
+### 1.3 DynamicPO: Boundary-Aware Dynamic Preference Optimization
 
 DynamicPO addresses this issue by refocusing multi-negative preference optimization on boundary-critical negatives. It first prioritizes preference-violation negatives and then uses likelihood-based clustering to identify near-boundary negatives when no violation exists.
 
 DynamicPO further applies dual-margin dynamic β adjustment to calibrate the optimization strength for each selected negative according to its boundary ambiguity. In this way, DynamicPO prevents optimization from being dominated by already separated negatives and enables more stable preference-boundary refinement.
 
-## Lightweight and Plug-and-Play
+### 1.4 Lightweight and Plug-and-Play
 
 DynamicPO can be applied to multiple multi-negative preference optimization objectives with negligible additional computational overhead. Experiments show that it effectively mitigates preference optimization collapse and improves recommendation performance across different LLM-based recommender settings.
 
-## Installation
+## 2. Installation
 
-### Requirements
+### 2.1 Requirements
 
 - Python: `>=3.9`
 - PyTorch: `2.4.0` or later
 - Transformers: `4.43.3`
 - Recommended hardware: we recommend 4 NVIDIA GPUs, such as A100, H100, or H200
 
-### Install Dependencies
+### 2.2 Install Dependencies
 
 Install dependencies with:
 
@@ -46,7 +48,7 @@ Install dependencies with:
 pip install -r requirements.txt
 ```
 
-## Data Preparation
+## 3. Data Preparation
 
 Extract the LastFM dataset:
 
@@ -59,10 +61,10 @@ After extraction, the processed LastFM data will be available under `./data/`.
 The extracted files include the processed splits used for supervised fine-tuning, preference optimization, and evaluation.
 
 Our data preprocessing and construction pipeline follows prior LLM-based recommendation work, mainly based on [LLaRA](https://arxiv.org/pdf/2312.02445). In particular, our data-related processing and negative sampling strategy are consistent with [S-DPO](https://arxiv.org/pdf/2406.09215).
-Currently, we provide the processed **LastFM** data for quick reproduction.
+Currently, we provide the processed **LastFM** data zip for quick reproduction in [`./data/`](/Users/huxingyu/DynamicPO/data), and the processed **Goodreads** and **Steam** data are also available in the Hugging Face Dataset release.
 We recommend that future researchers use **LastFM** first when validating their ideas and reproducing the pipeline, and only then move to **Goodreads** and **Steam**, since these two datasets usually require more computation than **LastFM**.
 
-## Quick Start
+## 4. Quick Start
 
 The main experiment in this repository is the **DMPO-based DynamicPO pipeline**. We provide separate scripts for:
 
@@ -113,7 +115,7 @@ sh ./scripts/03_inference/inference.sh
 
 You may append `&` to run the scripts in the background.
 
-## Results
+## 5. Results
 
 A compact summary of the most important tables is shown below. The following tables report `HitRatio@1`.
 
@@ -122,7 +124,7 @@ For the broader comparison setting, we follow previous research for the traditio
 > [!TIP]
 > Repository note: We have also recently reproduced our experiments on **NVIDIA H200** GPUs and are organizing the corresponding checkpoints for release on **Hugging Face**. In our recent repository-side runs, we found that results on H200 can even be slightly better than the A100-based results reported in the paper. Therefore, small reproduction differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
 
-### Main Comparison
+### 5.1 Main Comparison
 
 #### DMPO
 
@@ -131,7 +133,7 @@ For the broader comparison setting, we follow previous research for the traditio
 | Vanilla | 0.5848 | 0.5349 | 0.6383 |
 | DynamicPO | 0.6661 | 0.6728 | 0.6990 |
 
-### Cross-backbone Generalization
+### 5.2 Cross-backbone Generalization
 
 | Base Model | Variant | LastFM HR@1 | Goodreads HR@1 |
 | --- | --- | ---: | ---: |
@@ -140,7 +142,7 @@ For the broader comparison setting, we follow previous research for the traditio
 | Qwen2.5-7B-Instruct | Vanilla | 0.5892 | 0.6617 |
 | Qwen2.5-7B-Instruct | DynamicPO | 0.6433 | 0.7359 |
 
-### Efficiency
+### 5.3 Efficiency
 
 | Base Model | Vanilla DMPO | DynamicPO | Overhead |
 | --- | --- | --- | --- |
@@ -158,11 +160,11 @@ The second figure shows how the **reward win rate** evolves during training for 
 ![Figure 4b: Reward accuracy evolution](assets/figure4b_reward_accuracy_evolution.png)
 
 
-## Supplementary Multi-objective Experiments
+## 6. Supplementary Multi-objective Experiments
 
 The supplementary exploratory study provides additional scripts for evaluating DynamicPO on other multi-negative preference optimization objectives. These experiments are **not the default Quick Start path** of this repository, but they correspond to the **multi-objective generalization study** reported in the paper.
 
-### MPPO and S-DPO Extensions
+### 6.1 MPPO and S-DPO Extensions
 
 It includes two objective families:
 
@@ -171,7 +173,7 @@ It includes two objective families:
 
 The runnable entrypoint is `exploratory_study.py`, which uses `trainer/exploratory_study_trainer.py`.
 
-### Supplementary Results
+### 6.2 Supplementary Results
 
 #### MPPO
 
@@ -187,7 +189,7 @@ The runnable entrypoint is `exploratory_study.py`, which uses `trainer/explorato
 | Vanilla | 0.6617 | 0.6778 | 0.6948 |
 | DynamicPO | 0.6666 | 0.6843 | 0.6998 |
 
-### Reproducing Supplementary Comparisons
+### 6.3 Reproducing Supplementary Comparisons
 
 Run one of the following scripts depending on the objective family you want to reproduce:
 
@@ -207,7 +209,7 @@ These scripts correspond to:
 
 The exploratory scripts already include the settings used in our supplementary comparison. In most cases, you only need to check `MODEL_NAME` and `SFT_CHECKPOINT` before running them. Their key hyperparameters are aligned with the main setup, including `beta=1.0`, `neg_num=15`, `batch_size=4`, `gradient_accumulation_steps=8`, `learning_rate=1e-5`, and `num_train_epochs=3`.
 
-### Configuration
+### 6.4 Configuration
 
 For MPPO-family experiments:
 
@@ -221,7 +223,7 @@ For S-DPO-family experiments:
 - `filter_mode="DynamicPO_SDPO"` corresponds to DynamicPO-S-DPO.
 - `loss_type="w_ref"` should be used.
 
-### How to Read and Reproduce the Supplementary Comparisons
+### 6.5 How to Read and Reproduce the Supplementary Comparisons
 
 For a clear comparison, we suggest reproducing each objective family as a pair:
 
@@ -230,7 +232,7 @@ For a clear comparison, we suggest reproducing each objective family as a pair:
 
 Readers can also vary the number of negative samples, such as `1`, `3`, `5`, `10`, and `15`, to examine how preference-optimization collapse changes under different multi-negative settings.
 
-### What We Learned from the Supplementary Experiments
+### 6.6 What We Learned from the Supplementary Experiments
 
 #### Did DMPO, MPPO, and S-DPO exhibit the same collapse pattern?
 
@@ -246,7 +248,7 @@ In the supplementary exploratory study, we observed **clear preference-optimizat
 
 - Overall, these results suggest that DynamicPO shows **encouraging generalization capability** across other multi-negative preference optimization objectives. More broadly, these findings show that avoiding a clearly visible collapse and achieving the best final recommendation performance are related but not identical. An objective may appear more stable under certain settings, but still benefit from DynamicPO when boundary-critical negatives are dynamically identified and emphasized.
 
-## Future Directions
+## 7. Future Directions
 
 - We believe the potential of dynamic-beta mechanisms for preference optimization in large language model based recommender systems has not yet been fully explored. We welcome future research in this direction, although a more complete investigation may require substantial compute resources.
 - We believe that the two dynamic mechanisms in DynamicPO, namely dynamic boundary-negative selection and dynamic-beta adjustment, may also be applicable beyond recommendation, for example in natural dialogue and other large language model alignment scenarios that aim to better satisfy human preferences. At the same time, although [β-DPO](https://arxiv.org/abs/2407.08639) has already explored dynamic-beta mechanisms for natural question-answering settings, research on multi-negative dynamic-beta mechanisms in such settings is still far from comprehensive.
@@ -272,7 +274,7 @@ DynamicPO/
 
 The following equations summarize the **base multi-negative objective forms** used in this repository. DynamicPO further augments these objectives with **dynamic boundary-negative selection** and **sample-level dynamic β adjustment**. Please refer to their original papers for the full derivations.
 
-### [DMPO](https://arxiv.org/abs/2406.14868)
+**[DMPO](https://arxiv.org/abs/2406.14868)**
 
 ```math
 \mathcal{L}_{\mathrm{DMPO}}(\pi_\theta; \pi_{\mathrm{ref}})
@@ -295,7 +297,7 @@ The following equations summarize the **base multi-negative objective forms** us
 \right]
 ```
 
-### [MPPO](https://arxiv.org/abs/2412.15244)
+**[MPPO](https://arxiv.org/abs/2412.15244)**
 
 ```math
 \mathcal{L}_{\mathrm{MPPO}}(\pi_\theta)
@@ -313,7 +315,7 @@ N \cdot \pi_\theta(y_w \mid x)
 \right]
 ```
 
-### [S-DPO](https://arxiv.org/abs/2406.09215)
+**[S-DPO](https://arxiv.org/abs/2406.09215)**
 
 ```math
 \mathcal{L}_{\mathrm{S\text{-}DPO}}(\pi_\theta; \pi_{\mathrm{ref}})
@@ -342,9 +344,7 @@ N \cdot \pi_\theta(y_w \mid x)
 
 ## Citation
 
-If you find this repository useful, please consider citing our paper:
-
-This work received the **DASFAA 2026 Best Paper Award**.
+This work received the **DASFAA 2026 Best Paper Award**. If you find our work useful, please consider giving us a ⭐ and citing our paper:
 
 ```bibtex
 @article{hu2026dynamicpo,
