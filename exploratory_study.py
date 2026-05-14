@@ -161,11 +161,24 @@ def train(
         bnb_4bit_compute_dtype=torch.bfloat16,
     )
 
-    base_model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        device_map=device_map,
-        quantization_config=bnb_config,
-    )
+    if "Llama-3" in model_name:
+        base_model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map=device_map,
+            quantization_config=bnb_config,
+        )
+    elif "Qwen" in model_name:
+        base_model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map=device_map,
+            quantization_config=bnb_config,
+        )
+    else:
+        base_model = AutoModelForCausalLM.from_pretrained(
+            model_name,
+            device_map=device_map,
+            quantization_config=bnb_config,
+        )
     base_model.config.use_cache = False
     base_model = prepare_model_for_kbit_training(base_model)
     base_model = PeftModel.from_pretrained(
@@ -184,19 +197,37 @@ def train(
     }
     reference_model = None
     if ref_enable:
-        model_ref = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            device_map=device_map,
-            quantization_config=bnb_config,
-        )
+        if "Llama-3" in model_name:
+            model_ref = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                device_map=device_map,
+                quantization_config=bnb_config,
+            )
+        elif "Qwen" in model_name:
+            model_ref = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                device_map=device_map,
+                quantization_config=bnb_config,
+            )
+        else:
+            model_ref = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                device_map=device_map,
+                quantization_config=bnb_config,
+            )
         reference_model = PeftModel.from_pretrained(model_ref, resume_from_checkpoint)
         if _is_main_process():
             reference_model.print_trainable_parameters()
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
     if "Llama-3" in model_name:
-        tokenizer.pad_token = tokenizer.eos_token
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer.pad_token_id = 0
+    elif "Qwen" in model_name:
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
     else:
+        tokenizer = LlamaTokenizer.from_pretrained(model_name)
         tokenizer.pad_token_id = 0
     tokenizer.padding_side = "left"
 
