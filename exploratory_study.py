@@ -7,7 +7,7 @@ import torch
 from accelerate import Accelerator
 from datasets import load_dataset
 from peft import PeftModel, prepare_model_for_kbit_training
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments, LlamaForCausalLM, LlamaTokenizer
 
 from trainer.exploratory_study_trainer import DPOTrainer
 from Prompt import Prompt
@@ -161,20 +161,14 @@ def train(
         bnb_4bit_compute_dtype=torch.bfloat16,
     )
 
-    if "Llama-3" in model_name:
-        base_model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            device_map=device_map,
-            quantization_config=bnb_config,
-        )
-    elif "Qwen" in model_name:
+    if "Llama-3" in model_name or "Qwen" in model_name:
         base_model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map=device_map,
             quantization_config=bnb_config,
         )
     else:
-        base_model = AutoModelForCausalLM.from_pretrained(
+        base_model = LlamaForCausalLM.from_pretrained(
             model_name,
             device_map=device_map,
             quantization_config=bnb_config,
@@ -197,20 +191,14 @@ def train(
     }
     reference_model = None
     if ref_enable:
-        if "Llama-3" in model_name:
-            model_ref = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                device_map=device_map,
-                quantization_config=bnb_config,
-            )
-        elif "Qwen" in model_name:
+        if "Llama-3" in model_name or "Qwen" in model_name:
             model_ref = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 device_map=device_map,
                 quantization_config=bnb_config,
             )
         else:
-            model_ref = AutoModelForCausalLM.from_pretrained(
+            model_ref = LlamaForCausalLM.from_pretrained(
                 model_name,
                 device_map=device_map,
                 quantization_config=bnb_config,

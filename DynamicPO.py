@@ -4,7 +4,7 @@ import re
 import random
 import numpy as np
 from peft import get_peft_config, get_peft_model, get_peft_model_state_dict, LoraConfig, TaskType, PeftModel
-from transformers import AutoTokenizer, TrainingArguments, AutoModelForCausalLM, BitsAndBytesConfig
+from transformers import AutoTokenizer, TrainingArguments, AutoModelForCausalLM, BitsAndBytesConfig, LlamaForCausalLM, LlamaTokenizer
 from datasets import load_dataset
 from trainer.dynamicpo_trainer import DPOTrainer
 from peft import LoraConfig, prepare_model_for_kbit_training, get_peft_model
@@ -177,20 +177,14 @@ def train(
     )
 
 
-    if "Llama-3" in model_name:
-        base_model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            device_map=device_map,
-            quantization_config=bnb_config,
-        )
-    elif "Qwen" in model_name:
+    if "Llama-3" in model_name or "Qwen" in model_name:
         base_model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map=device_map,
             quantization_config=bnb_config,
         )
     else:
-        base_model = AutoModelForCausalLM.from_pretrained(
+        base_model = LlamaForCausalLM.from_pretrained(
             model_name,
             device_map=device_map,
             quantization_config=bnb_config,
@@ -204,20 +198,14 @@ def train(
 
     ref_enable=loss_type not in ["wo_ref"]
     if ref_enable:
-        if "Llama-3" in model_name:
-            model_ref = AutoModelForCausalLM.from_pretrained(
-                model_name,
-                device_map=device_map,
-                quantization_config=bnb_config,
-            )
-        elif "Qwen" in model_name:
+        if "Llama-3" in model_name or "Qwen" in model_name:
             model_ref = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 device_map=device_map,
                 quantization_config=bnb_config,
             )
         else:
-            model_ref = AutoModelForCausalLM.from_pretrained(
+            model_ref = LlamaForCausalLM.from_pretrained(
                 model_name,
                 device_map=device_map,
                 quantization_config=bnb_config,

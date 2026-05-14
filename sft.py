@@ -121,26 +121,15 @@ def train(
     device_index = Accelerator().process_index
     device_map = {"": device_index}
 
+    base_model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        device_map=device_map,
+        quantization_config=bnb_config,
+    )
     if "Llama-3" in model_name:
-        base_model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            device_map=device_map,
-            quantization_config=bnb_config,
-        )
         print("Llama-3!")
     elif "Qwen" in model_name:
-        base_model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            device_map=device_map,
-            quantization_config=bnb_config,
-        )
         print("Qwen!")
-    else:
-        base_model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            device_map=device_map,
-            quantization_config=bnb_config,
-        )
     base_model.config.use_cache = False
     base_model = prepare_model_for_kbit_training(base_model)
 
