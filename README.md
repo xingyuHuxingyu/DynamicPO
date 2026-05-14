@@ -23,13 +23,9 @@ These model-discriminative negatives can dominate the aggregated optimization si
 
 ### 1.3 DynamicPO: Boundary-Aware Dynamic Preference Optimization
 
-DynamicPO addresses this issue by refocusing multi-negative preference optimization on boundary-critical negatives. It first prioritizes preference-violation negatives and then uses likelihood-based clustering to identify near-boundary negatives when no violation exists.
+DynamicPO addresses this issue by refocusing multi-negative preference optimization on **boundary-critical negatives**. It first prioritizes **preference-violation negatives** and then uses **likelihood-based clustering** to identify near-boundary negatives when no violation exists.
 
-DynamicPO further applies dual-margin dynamic β adjustment to calibrate the optimization strength for each selected negative according to its boundary ambiguity. In this way, DynamicPO prevents optimization from being dominated by already separated negatives and enables more stable preference-boundary refinement.
-
-### 1.4 Lightweight and Plug-and-Play
-
-DynamicPO can be applied to multiple multi-negative preference optimization objectives with negligible additional computational overhead. Experiments show that it effectively mitigates preference optimization collapse and improves recommendation performance across different LLM-based recommender settings.
+DynamicPO further applies **dual-margin dynamic β adjustment** to calibrate the optimization strength for each selected negative according to its boundary ambiguity. In this way, DynamicPO prevents optimization from being dominated by already separated negatives, enables more stable **preference-boundary refinement**, and remains **plug-and-play** across multiple multi-negative preference optimization objectives with **negligible computational overhead**. Experiments show that it effectively mitigates **preference optimization collapse** and improves recommendation performance across different LLM-based recommender settings.
 
 ## 2. Installation
 
@@ -119,7 +115,7 @@ You may append `&` to run the scripts in the background.
 
 A compact summary of the most important tables is shown below. The following tables report `HitRatio@1`.
 
-For the broader comparison setting, we follow previous research for the traditional and LLM-based baselines and report their results, particularly under the benchmark construction and evaluation protocols adopted in LLaRA and S-DPO. Please refer to our arXiv paper for the full main-experiment comparison.
+For the broader comparison setting, we adopt the reported results of the traditional and LLM-based baselines from [LLaRA](https://arxiv.org/pdf/2312.02445) and [S-DPO](https://arxiv.org/pdf/2406.09215), and we follow the same dataset construction and evaluation protocols used in those works. Please refer to our arXiv paper for the full main-experiment comparison.
 
 > [!TIP]
 > Repository note: We have also recently reproduced our experiments on **NVIDIA H200** GPUs and are organizing the corresponding checkpoints for release on **Hugging Face**. In our recent repository-side runs, we found that results on H200 can even be slightly better than the A100-based results reported in the paper. Therefore, small reproduction differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
