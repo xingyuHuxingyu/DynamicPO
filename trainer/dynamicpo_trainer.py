@@ -206,7 +206,7 @@ def preference_loss(
     
   
   
-    elif filter_mode in {"DMPO_hard_negative_dynamic_beta_fixed_margin", "DynamicPO_DMPO"}:
+    elif filter_mode == "DynamicPO_DMPO":
         (
             boundary_critical_sample_list,
             policy_boundary_critical_list,

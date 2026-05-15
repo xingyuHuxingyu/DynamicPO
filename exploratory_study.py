@@ -186,8 +186,6 @@ def train(
     ref_enable = loss_type != "wo_ref" and filter_mode not in {
         "MPPO",
         "DynamicPO_MPPO",
-        "mppo_multineg_loss",
-        "mppo_hard_negative_dynamic_beta_fixed_margin",
     }
     reference_model = None
     if ref_enable:

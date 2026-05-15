@@ -117,39 +117,11 @@ def preference_loss(
     all_policy_rejected = _group_batch_values(policy_rejected_logps)
     all_policy_rejected_list = [all_policy_rejected[i] for i in range(len(all_policy_rejected))]
 
-    if filter_mode in {"DMPO"}:
-        losses = _compute_dmpo_losses(chosen_logratios, all_rejected_logratios, beta)
-        return (losses, None), None, None, chosen_rewards, rejected_rewards, (beta, beta, beta)
-
-    if filter_mode in {"DynamicPO_DMPO", "DMPO_hard_negative_dynamic_beta_fixed_margin"}:
-        boundary_critical_targets, boundary_critical_policy_values, model_discriminative_policy_means, batch_policy_rejected_list = (
-            _select_boundary_critical_samples(
-                target_values=rejected_logratios,
-                threshold_values=policy_chosen_logps,
-                policy_rejected_values=policy_rejected_logps,
-            )
-        )
-        beta_records, pos2boundary_records, boundary2discriminative_records = _build_dynamic_beta_records(
-            policy_chosen_logps,
-            boundary_critical_policy_values,
-            model_discriminative_policy_means,
-            beta,
-        )
-        losses = _compute_dmpo_losses(chosen_logratios, boundary_critical_targets, beta_records)
-        return (
-            (losses, None),
-            boundary_critical_policy_values,
-            batch_policy_rejected_list,
-            chosen_rewards,
-            rejected_rewards,
-            (beta_records, pos2boundary_records, boundary2discriminative_records),
-        )
-
-    if filter_mode in {"MPPO", "mppo_multineg_loss"}:
+    if filter_mode == "MPPO":
         losses = _compute_mppo_losses(policy_chosen_logps, all_policy_rejected_list, beta)
         return (losses, None), None, None, chosen_rewards, rejected_rewards, (beta, beta, beta)
 
-    if filter_mode in {"DynamicPO_MPPO", "mppo_hard_negative_dynamic_beta_fixed_margin"}:
+    if filter_mode == "DynamicPO_MPPO":
         boundary_critical_targets, boundary_critical_policy_values, model_discriminative_policy_means, batch_policy_rejected_list = (
             _select_boundary_critical_samples(
                 target_values=policy_rejected_logps,
