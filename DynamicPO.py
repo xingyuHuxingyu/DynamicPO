@@ -77,7 +77,8 @@ def train(
     num_train_epochs: int = 3,
     learning_rate: float = 1e-5,
     cutoff_len: int = 512,
-    eval_step = 4
+    eval_step = 4,
+    val_data_eval: bool = False,
 ):
     output_dir = _append_note_suffix(output_dir, custom_note)
     wandb_name = _append_note_suffix(wandb_name, custom_note)
@@ -93,9 +94,10 @@ def train(
         print(f"neg_num: {neg_num}")
         print(f"batch_size: {batch_size}")
         print(f"gradient_accumulation_steps: {gradient_accumulation_steps}")
+        print(f"val_data_eval:{val_data_eval}")
         print(f"output_dir:{output_dir}")
         print(f"wandb_name:{wandb_name}")
-    
+
     if dataset=="lastfm":
         data_files = {
             "train":"./data/lastfm-sft-cans20/lastfm-train.json",
@@ -111,11 +113,8 @@ def train(
             "train":"./data/steam-sft-cans20/steam-train.json",
             "validation": "./data/steam-sft-cans20/steam-val.json",
         }
-
-
-
-
-
+    else:
+        raise ValueError(f"Unsupported dataset: {dataset}")
 
     def convert_dict_to_prompt(d:dict):
         t = Prompt(prompt_path)
@@ -158,11 +157,13 @@ def train(
         for i in range(0, 4):
             print(train_data[i])
 
-    # random 2000 samples for validation
-    val_data = data["validation"].map(process_data, remove_columns=columns, \
-                                        num_proc=8, batched=True).shuffle(seed=42)
-    if val_data.num_rows > 2000:
-        val_data = val_data.select(range(2000))
+    val_data = None
+    if val_data_eval:
+        # random 2000 samples for validation
+        val_data = data["validation"].map(process_data, remove_columns=columns, \
+                                            num_proc=8, batched=True).shuffle(seed=42)
+        if val_data.num_rows > 2000:
+            val_data = val_data.select(range(2000))
     
    # print(val_data)
 
@@ -239,7 +240,7 @@ def train(
         save_strategy="steps",
         save_steps=eval_step,
         save_total_limit=100,
-        evaluation_strategy="no",
+        evaluation_strategy="steps" if val_data_eval else "no",
         eval_steps=eval_step,
         load_best_model_at_end=False,
         logging_steps=1,
@@ -261,7 +262,7 @@ def train(
         beta=beta,
         filter_mode=filter_mode,
         train_dataset=train_data,
-        eval_dataset=val_data,
+        eval_dataset=val_data if val_data_eval else None,
         tokenizer=tokenizer,
         max_prompt_length=cutoff_len,
         max_length=cutoff_len
