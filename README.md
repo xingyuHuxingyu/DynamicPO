@@ -5,6 +5,8 @@
 > [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![Hugging Face Paper](https://img.shields.io/badge/Hugging%20Face-Paper-yellow)](https://huggingface.co/papers/2605.00327) [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data) [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
 > [!NOTE]
+> 2026.5.17: Our **NVIDIA H200** reproductions for both the **main experiments** and the **supplementary experiments** have now been largely organized and uploaded to **Hugging Face**.
+>
 > 2026.5.13: We are currently reproducing the main experiments and supplementary experiments on NVIDIA H200 GPUs with CUDA 13.1 (nvcc 13.1.80), while the results reported in the paper are based on A100 GPUs. We are also organizing the model checkpoints, and the Hugging Face model page is still being updated. We expect the upload process to be completed within this week.
 
 ## 1. Summary of Paper
@@ -118,9 +120,9 @@ A compact summary of the most important tables is shown below. The following tab
 For the broader comparison setting, we adopt the reported results of the traditional and LLM-based baselines from [LLaRA](https://arxiv.org/pdf/2312.02445) and [S-DPO](https://arxiv.org/pdf/2406.09215), and we follow the same dataset construction and evaluation protocols used in those works. Please refer to our arXiv paper for the full main-experiment comparison.
 
 > [!TIP]
-> Repository note: We have also recently reproduced our experiments on **NVIDIA H200** GPUs and are organizing the corresponding checkpoints for release on **Hugging Face**. In our recent repository-side runs, we found that results on H200 can even be slightly better than the A100-based results reported in the paper. Therefore, small reproduction differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
+> Repository note: We have also recently reproduced our experiments on **NVIDIA H200** GPUs, and the corresponding checkpoints have been released on **Hugging Face**. In our recent repository-side runs, we found that results on H200 can even be slightly better than the A100-based results reported in the paper. Therefore, small reproduction differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
 
-### 5.1 Main Comparison
+### 5.1 Paper-Reported Main Results
 
 #### DMPO
 
@@ -129,7 +131,7 @@ For the broader comparison setting, we adopt the reported results of the traditi
 | Vanilla | 0.5848 | 0.5349 | 0.6383 |
 | DynamicPO | 0.6661 | 0.6728 | 0.6990 |
 
-### 5.2 Cross-backbone Generalization
+### 5.2 Paper-Reported Cross-backbone Generalization
 
 | Base Model | Variant | LastFM HR@1 | Goodreads HR@1 |
 | --- | --- | ---: | ---: |
@@ -138,7 +140,7 @@ For the broader comparison setting, we adopt the reported results of the traditi
 | Qwen2.5-7B-Instruct | Vanilla | 0.5892 | 0.6617 |
 | Qwen2.5-7B-Instruct | DynamicPO | 0.6433 | 0.7359 |
 
-### 5.3 Efficiency
+### 5.3 Paper-Reported Efficiency and Training Dynamics
 
 | Base Model | Vanilla DMPO | DynamicPO | Overhead |
 | --- | --- | --- | --- |
@@ -147,13 +149,40 @@ For the broader comparison setting, we adopt the reported results of the traditi
 | Qwen2.5-7B-Instruct | 4·A100 × 14h49min | 4·A100 × 14h57min | +8min |
 | Average | 62.58 h·A100 | 63.11 h·A100 | +0.85% |
 
-The first figure shows how the recommendation performance of vanilla DMPO and DynamicPO changes as the number of negative samples increases.
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/figure4a_negative_scaling.png" alt="Figure 4a: Negative sample scaling" width="95%">
+      <br>
+      <sub><b>Figure 4a.</b> Negative sample scaling.</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/figure4b_reward_accuracy_evolution.png" alt="Figure 4b: Reward accuracy evolution" width="95%">
+      <br>
+      <sub><b>Figure 4b.</b> Reward win rate during training.</sub>
+    </td>
+  </tr>
+</table>
 
-![Figure 4a: Negative sample scaling](assets/figure4a_negative_scaling.png)
+### 5.4 Latest H200 Reproduction Results
 
-The second figure shows how the **reward win rate** evolves during training for vanilla DMPO and DynamicPO.
+The tables below report our latest reproduced results on **NVIDIA H200** GPUs with **CUDA 13.1 (nvcc 13.1.80)**. These numbers are slightly different from the paper-reported results because the paper results are based on **A100** GPUs. We keep both versions here for transparency. The corresponding reproduced checkpoints have been released on **Hugging Face**.
 
-![Figure 4b: Reward accuracy evolution](assets/figure4b_reward_accuracy_evolution.png)
+#### Generalization across Multi-Negative Preference Optimization Objectives: DMPO, MPPO, and S-DPO (Llama2-7B)
+
+| Objective | Vanilla | DynamicPO |
+| :-- | --: | --: |
+| DMPO | 0.58757 | **0.67535** |
+| MPPO | 0.67454 | **0.69419** |
+| S-DPO | 0.66774 | **0.67575** |
+
+#### Effectiveness of DynamicPO across Different Backbone Language Models (DMPO)
+
+| Backbone | Vanilla | DynamicPO |
+| :-- | --: | --: |
+| Llama2-7b-hf | 0.58757 | **0.67535** |
+| Llama3-8B-Instruct | 0.60481 | **0.73106** |
+| Qwen2.5-7B-Instruct | 0.56874 | **0.64529** |
 
 
 ## 6. Supplementary Multi-objective Experiments
