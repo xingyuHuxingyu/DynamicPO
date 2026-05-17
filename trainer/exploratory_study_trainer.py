@@ -149,7 +149,7 @@ def preference_loss(
         losses = _compute_sdpo_losses(chosen_logratios, all_rejected_logratios, beta)
         return (losses, None), None, None, chosen_rewards, rejected_rewards, (beta, beta, beta)
 
-    if filter_mode in {"DynamicPO_SDPO", "SDPO_hard_negative_dynamic_beta_fixed_margin"}:
+    if filter_mode == "DynamicPO_SDPO":
         boundary_critical_targets, boundary_critical_policy_values, model_discriminative_policy_means, batch_policy_rejected_list = (
             _select_boundary_critical_samples(
                 target_values=rejected_logratios,
