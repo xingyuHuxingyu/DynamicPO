@@ -29,6 +29,9 @@ DynamicPO addresses this issue by refocusing multi-negative preference optimizat
 
 DynamicPO further applies **dual-margin dynamic β adjustment** to calibrate the optimization strength for each selected negative according to its boundary ambiguity. In this way, DynamicPO prevents optimization from being dominated by already separated negatives, enables more stable **preference-boundary refinement**, and remains **plug-and-play** across multiple multi-negative preference optimization objectives with **negligible computational overhead**. Experiments show that it effectively mitigates **preference optimization collapse** and improves recommendation performance across different LLM-based recommender settings.
 
+> [!NOTE]
+> Due to publisher page limits, we place additional discussion and results in the appendix of the arXiv version, including more thoughts on the **preference optimization collapse** phenomenon and future directions.
+
 ## 2. Installation
 
 ### 2.1 Requirements
