@@ -375,11 +375,13 @@ N \cdot \pi_\theta(y_w \mid x)
 This work received the **DASFAA 2026 Best Paper Award**. If you find our work useful, please consider giving us a ⭐ and citing our paper:
 
 ```bibtex
-@article{hu2026dynamicpo,
+@inproceedings{hu2026dynamicpo,
   title={DynamicPO: Dynamic Preference Optimization for Recommendation},
   author={Hu, Xingyu and Zhang, Kai and Wu, Jiancan and Wang, Shuli and Wang, Chi and Chen, Wenshuai and Zhu, Yinhua and Wang, Haitao and Wang, Xingxing and Wang, Xiang},
-  journal={arXiv preprint arXiv:2605.00327},
-  year={2026}
+  booktitle={International Conference on Database Systems for Advanced Applications},
+  pages={372--387},
+  year={2026},
+  organization={Springer}
 }
 ```
 
