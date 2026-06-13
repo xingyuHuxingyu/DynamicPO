@@ -5,6 +5,8 @@
 > [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![Hugging Face Paper](https://img.shields.io/badge/Hugging%20Face-Paper-yellow)](https://huggingface.co/papers/2605.00327) [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data) [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
 > [!NOTE]
+> 2026.6.13: To better support follow-up research, we are further expanding the number of negative samples in our experiments. Beyond **DMPO**, we are also conducting additional studies on how **MPPO** and **S-DPO** behave as the number of negative samples increases, in order to better understand the **preference optimization collapse** phenomenon. A more complete analysis and the corresponding **future directions** are still being organized and will be included in the appendix of the **arXiv** version. The current arXiv paper is not yet the final version, and we expect to complete these updates within the next two weeks.
+>
 > 2026.5.17: Our **NVIDIA H200** reproductions for both the **main experiments** and the **supplementary experiments** have now been largely organized and uploaded to **Hugging Face**.
 >
 > 2026.5.13: We are currently reproducing the main experiments and supplementary experiments on NVIDIA H200 GPUs with CUDA 13.1 (nvcc 13.1.80), while the results reported in the paper are based on A100 GPUs. We are also organizing the model checkpoints, and the Hugging Face model page is still being updated. We expect the upload process to be completed within this week.
