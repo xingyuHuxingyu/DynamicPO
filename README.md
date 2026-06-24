@@ -5,11 +5,13 @@
 > [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![Hugging Face Paper](https://img.shields.io/badge/Hugging%20Face-Paper-yellow)](https://huggingface.co/papers/2605.00327) [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data) [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
 > [!NOTE]
-> 2026.6.13: To better support follow-up research, we are further expanding the number of negative samples in our experiments. Beyond **DMPO**, we are also conducting additional studies on how **MPPO** and **S-DPO** behave as the number of negative samples increases, in order to better understand the **preference optimization collapse** phenomenon. A more complete analysis and the corresponding **future directions** are still being organized and will be included in the appendix of the **arXiv** version. The current arXiv paper is not yet the final version, and we expect to complete these updates within the next two weeks.
+> 2026.6.24: We have completed the extended scaling experiments up to **19 negatives** for **DMPO**, **MPPO**, and **S-DPO**. More supplementary experiments, discussion, and **future directions** are provided in the appendix of the **arXiv** version.
 >
-> 2026.5.17: Our **NVIDIA H200** reproductions for both the **main experiments** and the **supplementary experiments** have now been largely organized and uploaded to **Hugging Face**.
+> 2026.6.13: We expanded the negative-set analysis from **DMPO** to **MPPO** and **S-DPO** to further study the **preference optimization collapse** phenomenon.
 >
-> 2026.5.13: We are currently reproducing the main experiments and supplementary experiments on NVIDIA H200 GPUs with CUDA 13.1 (nvcc 13.1.80), while the results reported in the paper are based on A100 GPUs. We are also organizing the model checkpoints, and the Hugging Face model page is still being updated. We expect the upload process to be completed within this week.
+> 2026.5.17: Our **NVIDIA H200** reproductions for both the **main experiments** and the **supplementary experiments** have been organized and uploaded to **Hugging Face**.
+>
+> 2026.5.13: We started reproducing the main and supplementary experiments on **NVIDIA H200** GPUs with **CUDA 13.1** (`nvcc 13.1.80`), while the paper-reported results are based on **A100** GPUs.
 
 ## 1. Summary of Paper
 
@@ -32,7 +34,7 @@ DynamicPO addresses this issue by refocusing multi-negative preference optimizat
 DynamicPO further applies **dual-margin dynamic β adjustment** to calibrate the optimization strength for each selected negative according to its boundary ambiguity. In this way, DynamicPO prevents optimization from being dominated by already separated negatives, enables more stable **preference-boundary refinement**, and remains **plug-and-play** across multiple multi-negative preference optimization objectives with **negligible computational overhead**. Experiments show that it effectively mitigates **preference optimization collapse** and improves recommendation performance across different LLM-based recommender settings.
 
 > [!NOTE]
-> Due to publisher page limits, we place additional discussion and results in the appendix of the arXiv version, including more thoughts on the **preference optimization collapse** phenomenon and future directions.
+> Due to publisher page limits, more detailed discussion, supplementary results, and **future directions** are provided in the appendix of the **arXiv** version.
 
 ## 2. Installation
 
@@ -125,9 +127,9 @@ A compact summary of the most important tables is shown below. The following tab
 For the broader comparison setting, we adopt the reported results of the traditional and LLM-based baselines from [LLaRA](https://arxiv.org/pdf/2312.02445) and [S-DPO](https://arxiv.org/pdf/2406.09215), and we follow the same dataset construction and evaluation protocols used in those works. Please refer to our arXiv paper for the full main-experiment comparison.
 
 > [!TIP]
-> Repository note: We have also recently reproduced our experiments on **NVIDIA H200** GPUs, and the corresponding checkpoints have been released on **Hugging Face**. In our recent repository-side runs, we found that results on H200 can even be slightly better than the A100-based results reported in the paper. Therefore, small reproduction differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
+> The paper-reported results in Sections **5.1** to **5.3** were obtained on **A100** GPUs. To support reproduction and checkpoint release, we also report the latest **H200** runs in Section **5.4**. Small differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
 
-### 5.1 Paper-Reported Main Results
+### 5.1 Paper-Reported Main Results on A100
 
 #### DMPO
 
@@ -136,7 +138,21 @@ For the broader comparison setting, we adopt the reported results of the traditi
 | Vanilla | 0.5848 | 0.5349 | 0.6383 |
 | DynamicPO | 0.6661 | 0.6728 | 0.6990 |
 
-### 5.2 Paper-Reported Cross-backbone Generalization
+#### MPPO
+
+| Variant | LastFM HR@1 | Goodreads HR@1 | Steam HR@1 |
+| --- | ---: | ---: | ---: |
+| Vanilla | 0.6597 | 0.6993 | 0.7614 |
+| DynamicPO | 0.6906 | 0.7226 | 0.8069 |
+
+#### S-DPO
+
+| Variant | LastFM HR@1 | Goodreads HR@1 | Steam HR@1 |
+| --- | ---: | ---: | ---: |
+| Vanilla | 0.6617 | 0.6778 | 0.6948 |
+| DynamicPO | 0.6666 | 0.6843 | 0.6998 |
+
+### 5.2 Paper-Reported Cross-backbone Generalization on A100
 
 | Base Model | Variant | LastFM HR@1 | Goodreads HR@1 |
 | --- | --- | ---: | ---: |
@@ -145,7 +161,7 @@ For the broader comparison setting, we adopt the reported results of the traditi
 | Qwen2.5-7B-Instruct | Vanilla | 0.5892 | 0.6617 |
 | Qwen2.5-7B-Instruct | DynamicPO | 0.6433 | 0.7359 |
 
-### 5.3 Paper-Reported Efficiency and Training Dynamics
+### 5.3 Paper-Reported Efficiency and Training Dynamics on A100
 
 | Base Model | Vanilla DMPO | DynamicPO | Overhead |
 | --- | --- | --- | --- |
@@ -169,9 +185,9 @@ For the broader comparison setting, we adopt the reported results of the traditi
   </tr>
 </table>
 
-### 5.4 Latest H200 Reproduction Results
+### 5.4 Latest H200 Reproduction Results for Reproduction and Checkpoint Release
 
-The tables below report our latest reproduced results on **NVIDIA H200** GPUs with **CUDA 13.1 (nvcc 13.1.80)**. These numbers are slightly different from the paper-reported results because the paper results are based on **A100** GPUs. We keep both versions here for transparency. The corresponding reproduced checkpoints have been released on **Hugging Face**.
+The tables below report our latest reproduced results on **NVIDIA H200** GPUs with **CUDA 13.1 (nvcc 13.1.80)**. These numbers are slightly different from the paper-reported results because the paper results are based on **NVIDIA A100** GPUs. We keep both versions here for transparency. The corresponding reproduced checkpoints on **NVIDIA H200** have been released on **Hugging Face**.
 
 #### Generalization across Multi-Negative Preference Optimization Objectives: DMPO, MPPO, and S-DPO (Llama2-7B)
 
@@ -192,7 +208,7 @@ The tables below report our latest reproduced results on **NVIDIA H200** GPUs wi
 
 ## 6. Supplementary Multi-objective Experiments
 
-The supplementary exploratory study provides additional scripts for evaluating DynamicPO on other multi-negative preference optimization objectives. These experiments are **not the default Quick Start path** of this repository, but they correspond to the **multi-objective generalization study** reported in the paper.
+This supplementary section provides additional scripts for evaluating DynamicPO on other multi-negative preference optimization objectives. These experiments are **not the default Quick Start path** of this repository, but correspond to the **multi-objective generalization study** reported in the paper.
 
 ### 6.1 MPPO and S-DPO Extensions
 
@@ -203,25 +219,35 @@ It includes two objective families:
 
 The runnable entrypoint is `exploratory_study.py`, which uses `trainer/exploratory_study_trainer.py`.
 
-### 6.2 Supplementary Results
+### 6.2 Extended Negative-Set Scaling to 19 Negatives
 
-#### MPPO
+To further examine whether **preference optimization collapse** generalizes across different multi-negative objectives, we extend the maximum number of negatives from `15` to `19` on **LastFM** and analyze the complete scaling behavior of vanilla **DMPO**, **MPPO**, and **S-DPO**. These supplementary scaling experiments are conducted on **NVIDIA H200** GPUs, and the corresponding checkpoints are released on **Hugging Face**.
 
-| Variant | LastFM HR@1 | Goodreads HR@1 | Steam HR@1 |
-| --- | ---: | ---: | ---: |
-| Vanilla | 0.6597 | 0.6993 | 0.7614 |
-| DynamicPO | 0.6906 | 0.7226 | 0.8069 |
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="assets/DMPO_scaling.png" alt="DMPO scaling curve" width="95%">
+      <br>
+      <sub><b>DMPO.</b> Scaling behavior as the number of negative samples increases.</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/MPPO_scaling.png" alt="MPPO scaling curve" width="95%">
+      <br>
+      <sub><b>MPPO.</b> Scaling behavior as the number of negative samples increases.</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/SDPO_scaling.png" alt="S-DPO scaling curve" width="95%">
+      <br>
+      <sub><b>S-DPO.</b> Scaling behavior as the number of negative samples increases.</sub>
+    </td>
+  </tr>
+</table>
 
-#### S-DPO
-
-| Variant | LastFM HR@1 | Goodreads HR@1 | Steam HR@1 |
-| --- | ---: | ---: | ---: |
-| Vanilla | 0.6617 | 0.6778 | 0.6948 |
-| DynamicPO | 0.6666 | 0.6843 | 0.6998 |
+These curves show that **DMPO** and **MPPO** both exhibit non-monotonic scaling behavior as the negative set grows, while **S-DPO** remains comparatively stable within the evaluated range. DynamicPO improves all three objectives under the enlarged negative-set setting, further supporting its generalization across different multi-negative preference optimization formulations.
 
 ### 6.3 Reproducing Supplementary Comparisons
 
-Run one of the following scripts depending on the objective family you want to reproduce:
+Run one of the following scripts:
 
 ```bash
 sh ./scripts/exploratory_study/MPPO/MPPO.sh
@@ -230,59 +256,34 @@ sh ./scripts/exploratory_study/SDPO/SDPO.sh
 sh ./scripts/exploratory_study/SDPO/DynamicPO_SDPO.sh
 ```
 
-These scripts correspond to:
+In most cases, you only need to check:
 
-- `MPPO`: the MPPO baseline
-- `DynamicPO_MPPO`: MPPO enhanced with DynamicPO
-- `SDPO`: the S-DPO baseline
-- `DynamicPO_SDPO`: S-DPO enhanced with DynamicPO
+- `MODEL_NAME`
+- `SFT_CHECKPOINT`
 
-The exploratory scripts already include the settings used in our supplementary comparison. In most cases, you only need to check `MODEL_NAME` and `SFT_CHECKPOINT` before running them. Their key hyperparameters are aligned with the main setup, including `beta=1.0`, `neg_num=15`, `batch_size=4`, `gradient_accumulation_steps=8`, `learning_rate=1e-5`, and `num_train_epochs=3`.
+For the objective-specific setting:
 
-### 6.4 Configuration
+- `MPPO` / `DynamicPO_MPPO`: use `loss_type="wo_ref"`
+- `SDPO` / `DynamicPO_SDPO`: use `loss_type="w_ref"`
 
-For MPPO-family experiments:
-
-- `filter_mode="MPPO"` corresponds to the MPPO baseline.
-- `filter_mode="DynamicPO_MPPO"` corresponds to DynamicPO-MPPO.
-- `loss_type="wo_ref"` should be used.
-
-For S-DPO-family experiments:
-
-- `filter_mode="SDPO"` corresponds to the S-DPO baseline.
-- `filter_mode="DynamicPO_SDPO"` corresponds to DynamicPO-S-DPO.
-- `loss_type="w_ref"` should be used.
-
-### 6.5 How to Read and Reproduce the Supplementary Comparisons
-
-For a clear comparison, we suggest reproducing each objective family as a pair:
+For a clear comparison, we recommend reproducing each family as a pair:
 
 1. `MPPO` vs. `DynamicPO_MPPO`
 2. `SDPO` vs. `DynamicPO_SDPO`
 
-Readers can also vary the number of negative samples, such as `1`, `3`, `5`, `10`, and `15`, to examine how preference-optimization collapse changes under different multi-negative settings.
+You can also vary the number of negative samples, such as `1`, `3`, `5`, `10`, `15`, and `19`, to examine how preference-optimization collapse changes under different multi-negative settings.
 
-### 6.6 What We Learned from the Supplementary Experiments
+### 6.4 What We Learned from the Supplementary Experiments
 
-#### Did DMPO, MPPO, and S-DPO exhibit the same collapse pattern?
-
-In the supplementary exploratory study, we observed **clear preference-optimization collapse** phenomena in DMPO and MPPO. Among them, **DMPO exhibits the most severe collapse pattern**, while **MPPO shows a stage-wise declining oscillation** as the number of negative samples increases. In contrast, we did **not observe a similarly clear collapse pattern** for S-DPO under the tested settings.
-
-#### Does the absence of obvious collapse in S-DPO mean it is the best objective?
-
-- Our current interpretation is that different multi-negative preference optimization objectives may respond differently to larger negative sets. In particular, the softmax-based objective in S-DPO may implicitly reduce the influence of model-discriminative negatives during optimization. These negatives have already been well separated by the model and therefore provide limited information for further preference-boundary refinement. We believe this may partially explain why a clearly visible collapse was not observed for S-DPO in the tested setting.
-
-- At the same time, we do **not interpret** the absence of a clearly visible collapse as evidence that one objective is inherently better than the others.
-
-- In our experiments, applying DynamicPO to S-DPO still improves over vanilla S-DPO, suggesting that **boundary-critical negatives** remain useful for this objective as well. Meanwhile, applying DynamicPO to DMPO or MPPO can achieve even stronger performance under the same recommendation setting, outperforming S-DPO in our current experiments. Our view is that different multi-negative preference optimization objectives may have different strengths: some may appear more stable under larger negative sets, while others may benefit more once DynamicPO is applied to better handle boundary-critical negatives and dynamic optimization-strength adjustment.
-
-- Overall, these results suggest that DynamicPO shows **encouraging generalization capability** across other multi-negative preference optimization objectives. More broadly, these findings show that avoiding a clearly visible collapse and achieving the best final recommendation performance are related but not identical. An objective may appear more stable under certain settings, but still benefit from DynamicPO when boundary-critical negatives are dynamically identified and emphasized.
+- **DMPO** and **MPPO** both show non-monotonic scaling behavior as the negative set grows, but **DMPO collapses earlier and more sharply**, while **MPPO** tolerates larger negative sets before degrading.
+- **S-DPO** remains comparatively stable within the evaluated range up to `19` negatives, but this stability does **not** imply uniform objective superiority. After applying **DynamicPO**, **DMPO**, **MPPO**, and **S-DPO** all achieve clear improvements and each surpasses **vanilla S-DPO** under the same setting.
+- **DynamicPO** improves **DMPO**, **MPPO**, and **S-DPO** under enlarged negative-set settings, suggesting encouraging generalization across different multi-negative preference optimization objectives. More details are provided in the **arXiv appendix**.
 
 ## 7. Future Directions
 
-- We believe the potential of dynamic-beta mechanisms for preference optimization in large language model based recommender systems has not yet been fully explored. We welcome future research in this direction, although a more complete investigation may require substantial compute resources.
-- We believe that the two dynamic mechanisms in DynamicPO, namely dynamic boundary-negative selection and dynamic-beta adjustment, may also be applicable beyond recommendation, for example in natural dialogue and other large language model alignment scenarios that aim to better satisfy human preferences. At the same time, although [β-DPO](https://arxiv.org/abs/2407.08639) has already explored dynamic-beta mechanisms for natural question-answering settings, research on multi-negative dynamic-beta mechanisms in such settings is still far from comprehensive.
-- We also believe that generative recommendation is a promising direction for extending the two dynamic mechanisms in DynamicPO, including combinations with GRPO or other preference-optimization objectives. In particular, recent open generative recommendation frameworks such as [MiniOneRec](https://arxiv.org/pdf/2510.24431) may provide a useful testbed for studying how dynamic boundary-negative selection and dynamic-beta adjustment interact with generative recommendation pipelines, GenRec-style settings, and broader multi-negative preference optimization methods.
+- Study **dynamic-β** more systematically, especially its effects on gradient allocation, training stability, and preference-boundary refinement.
+- Extend **DynamicPO beyond recommendation** to broader LLM alignment settings such as dialogue, question answering, and instruction following.
+- Explore whether the same boundary-aware principle can also benefit **online RL** methods such as PPO and GRPO.
 
 ## Project Structure
 
