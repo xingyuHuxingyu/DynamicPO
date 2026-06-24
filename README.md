@@ -5,7 +5,7 @@
 > [![DASFAA 2026 Best Paper](https://img.shields.io/badge/DASFAA%202026-Best%20Paper-blue)](https://dasfaa2026.github.io/program/awards.html) [![Hugging Face Paper](https://img.shields.io/badge/Hugging%20Face-Paper-yellow)](https://huggingface.co/papers/2605.00327) [![Hugging Face Dataset](https://img.shields.io/badge/Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/xingyuHuxingyu/DynamicPO-Data) [![Hugging Face Model](https://img.shields.io/badge/Hugging%20Face-Model-orange)](https://huggingface.co/xingyuHuxingyu/DynamicPO)
 
 > [!NOTE]
-> 2026.6.24: We have completed the extended scaling experiments up to **19 negatives** for **DMPO**, **MPPO**, and **S-DPO**. More supplementary experiments, discussion, and **future directions** are provided in the appendix of the **arXiv** version.
+> 2026.6.24: We have completed the extended scaling experiments up to **19 negatives** for **DMPO**, **MPPO**, and **S-DPO**. More supplementary experiments, discussion, and **future directions** are provided in the appendix of the [arXiv](https://arxiv.org/abs/2605.00327) version.
 >
 > 2026.6.13: We expanded the negative-set analysis from **DMPO** to **MPPO** and **S-DPO** to further study the **preference optimization collapse** phenomenon.
 >
@@ -34,7 +34,7 @@ DynamicPO addresses this issue by refocusing multi-negative preference optimizat
 DynamicPO further applies **dual-margin dynamic β adjustment** to calibrate the optimization strength for each selected negative according to its boundary ambiguity. In this way, DynamicPO prevents optimization from being dominated by already separated negatives, enables more stable **preference-boundary refinement**, and remains **plug-and-play** across multiple multi-negative preference optimization objectives with **negligible computational overhead**. Experiments show that it effectively mitigates **preference optimization collapse** and improves recommendation performance across different LLM-based recommender settings.
 
 > [!NOTE]
-> Due to publisher page limits, more detailed discussion, supplementary results, and **future directions** are provided in the appendix of the **arXiv** version.
+> Due to publisher page limits, more detailed discussion, supplementary results, and **future directions** are provided in the appendix of the [arXiv](https://arxiv.org/abs/2605.00327) version.
 
 ## 2. Installation
 
@@ -65,8 +65,8 @@ unzip lastfm-sft-cans20.zip
 After extraction, the processed LastFM data will be available under `./data/`.
 The extracted files include the processed splits used for supervised fine-tuning, preference optimization, and evaluation.
 
-Our data preprocessing and construction pipeline follows prior LLM-based recommendation work, mainly based on [LLaRA](https://arxiv.org/pdf/2312.02445). In particular, our data-related processing and negative sampling strategy are consistent with [S-DPO](https://arxiv.org/pdf/2406.09215).
-Currently, we provide the processed **LastFM** data zip for quick reproduction in [`./data/`](/Users/huxingyu/DynamicPO/data), and the processed **Goodreads** and **Steam** data are also available in the Hugging Face Dataset release.
+Our data preprocessing follows prior LLM-based recommendation work, mainly [LLaRA](https://arxiv.org/pdf/2312.02445), and the negative sampling strategy follows [S-DPO](https://arxiv.org/pdf/2406.09215).
+We provide the processed **LastFM** data zip for quick reproduction in [`./data/`](/Users/huxingyu/DynamicPO/data), and the processed **Goodreads** and **Steam** data are also available in the Hugging Face Dataset release.
 We recommend that future researchers use **LastFM** first when validating their ideas and reproducing the pipeline, and only then move to **Goodreads** and **Steam**, since these two datasets usually require more computation than **LastFM**.
 
 ## 4. Quick Start
@@ -122,9 +122,9 @@ You may append `&` to run the scripts in the background.
 
 ## 5. Results
 
-A compact summary of the most important tables is shown below. The following tables report `HitRatio@1`.
+A compact summary of the most important tables is shown below. All reported metrics below are `HitRatio@1`.
 
-For the broader comparison setting, we adopt the reported results of the traditional and LLM-based baselines from [LLaRA](https://arxiv.org/pdf/2312.02445) and [S-DPO](https://arxiv.org/pdf/2406.09215), and we follow the same dataset construction and evaluation protocols used in those works. Please refer to our arXiv paper for the full main-experiment comparison.
+For the broader comparison setting, we adopt the reported results of the traditional and LLM-based baselines from [LLaRA](https://arxiv.org/pdf/2312.02445) and [S-DPO](https://arxiv.org/pdf/2406.09215), and we follow the same dataset construction and evaluation protocols used in those works. Please refer to our [arXiv paper](https://arxiv.org/abs/2605.00327) for the full main-experiment comparison.
 
 > [!TIP]
 > The paper-reported results in Sections **5.1** to **5.3** were obtained on **A100** GPUs. To support reproduction and checkpoint release, we also report the latest **H200** runs in Section **5.4**. Small differences across environments, such as **CUDA / NVCC versions** and **GPU types** (for example, A100, H100, or H200), are normal and should be expected.
@@ -276,8 +276,9 @@ You can also vary the number of negative samples, such as `1`, `3`, `5`, `10`, `
 ### 6.4 What We Learned from the Supplementary Experiments
 
 - **DMPO** and **MPPO** both show non-monotonic scaling behavior as the negative set grows, but **DMPO collapses earlier and more sharply**, while **MPPO** tolerates larger negative sets before degrading.
-- **S-DPO** remains comparatively stable within the evaluated range up to `19` negatives, but this stability does **not** imply uniform objective superiority. After applying **DynamicPO**, **DMPO**, **MPPO**, and **S-DPO** all achieve clear improvements and each surpasses **vanilla S-DPO** under the same setting.
-- **DynamicPO** improves **DMPO**, **MPPO**, and **S-DPO** under enlarged negative-set settings, suggesting encouraging generalization across different multi-negative preference optimization objectives. More details are provided in the **arXiv appendix**.
+- **S-DPO** remains comparatively stable within the evaluated range up to `19` negatives, but this stability does **not** imply uniform objective superiority.
+- After applying **DynamicPO**, **DMPO**, **MPPO**, and **S-DPO** all improve clearly, and each surpasses **vanilla S-DPO** under the same setting.
+- **DynamicPO** improves **DMPO**, **MPPO**, and **S-DPO** under enlarged negative-set settings, suggesting encouraging generalization across different multi-negative preference optimization objectives. More details are provided in the [arXiv appendix](https://arxiv.org/abs/2605.00327).
 
 ## 7. Future Directions
 
