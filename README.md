@@ -306,7 +306,7 @@ DynamicPO/
 
 The following equations summarize the **base multi-negative objective forms** used in this repository. DynamicPO further augments these objectives with **dynamic boundary-negative selection** and **sample-level dynamic β adjustment**. Please refer to their original papers for the full derivations.
 
-**[DMPO](https://arxiv.org/abs/2406.14868)**
+**[DMPO](https://dl.acm.org/doi/10.1145/3627673.3679611)**
 
 ```math
 \mathcal{L}_{\mathrm{DMPO}}(\pi_\theta; \pi_{\mathrm{ref}})
