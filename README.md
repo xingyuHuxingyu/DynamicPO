@@ -66,7 +66,7 @@ After extraction, the processed LastFM data will be available under `./data/`.
 The extracted files include the processed splits used for supervised fine-tuning, preference optimization, and evaluation.
 
 Our data preprocessing follows prior LLM-based recommendation work, mainly [LLaRA](https://arxiv.org/pdf/2312.02445), and the negative sampling strategy follows [S-DPO](https://arxiv.org/pdf/2406.09215).
-We provide the processed **LastFM** data zip for quick reproduction in [`./data/`](/Users/huxingyu/DynamicPO/data), and the processed **Goodreads** and **Steam** data are also available in the Hugging Face Dataset release.
+We provide the processed **LastFM** data zip for quick reproduction in [./data/](./data/), and the processed **Goodreads** and **Steam** data are also available in the Hugging Face Dataset release.
 We recommend that future researchers use **LastFM** first when validating their ideas and reproducing the pipeline, and only then move to **Goodreads** and **Steam**, since these two datasets usually require more computation than **LastFM**.
 
 ## 4. Quick Start
@@ -81,7 +81,7 @@ The main experiment in this repository is the **DMPO-based DynamicPO pipeline**.
 Run:
 
 ```bash
-sh ./scripts/01_sft/sft.sh
+bash ./scripts/01_sft/sft.sh
 ```
 
 This produces the SFT checkpoint used by the preference-optimization stage.
@@ -91,13 +91,13 @@ This produces the SFT checkpoint used by the preference-optimization stage.
 For the DMPO baseline, run:
 
 ```bash
-sh ./scripts/02_preference_optimization/DMPO.sh
+bash ./scripts/02_preference_optimization/DMPO.sh
 ```
 
 For the DynamicPO-DMPO main experiment, run:
 
 ```bash
-sh ./scripts/02_preference_optimization/DynamicPO_DMPO.sh
+bash ./scripts/02_preference_optimization/DynamicPO_DMPO.sh
 ```
 
 Both scripts launch `DynamicPO.py`, which uses `trainer/dynamicpo_trainer.py`.
@@ -115,7 +115,7 @@ The scripts already contain the recommended training settings. In most cases, yo
 Run:
 
 ```bash
-sh ./scripts/03_inference/inference.sh
+bash ./scripts/03_inference/inference.sh
 ```
 
 You may append `&` to run the scripts in the background.
@@ -250,10 +250,10 @@ These curves show that **DMPO** and **MPPO** both exhibit non-monotonic scaling 
 Run one of the following scripts:
 
 ```bash
-sh ./scripts/exploratory_study/MPPO/MPPO.sh
-sh ./scripts/exploratory_study/MPPO/DynamicPO_MPPO.sh
-sh ./scripts/exploratory_study/SDPO/SDPO.sh
-sh ./scripts/exploratory_study/SDPO/DynamicPO_SDPO.sh
+bash ./scripts/exploratory_study/MPPO/MPPO.sh
+bash ./scripts/exploratory_study/MPPO/DynamicPO_MPPO.sh
+bash ./scripts/exploratory_study/SDPO/SDPO.sh
+bash ./scripts/exploratory_study/SDPO/DynamicPO_SDPO.sh
 ```
 
 In most cases, you only need to check:
